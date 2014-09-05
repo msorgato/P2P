@@ -12,7 +12,7 @@ import client.Client;
 public class ConcreteServer extends UnicastRemoteObject implements Server {
 	private String name;
 	private ArrayList<ClientRegistry> registry = new ArrayList<ClientRegistry>();
-	private Vector<Server> servers;
+	private ArrayList<Server> servers;
 	private static final String HOST = "localhost";
 	
 	private class ClientRegistry {
@@ -46,7 +46,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		}
 	}
 	
-	protected ConcreteServer(String nm, Vector<Server> sr) throws RemoteException {
+	protected ConcreteServer(String nm, ArrayList<Server> sr) throws RemoteException {
 		super();
 		name = nm;
 		servers = sr;

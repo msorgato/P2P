@@ -13,7 +13,7 @@ private static Vector<Server> servers = new Vector<Server>();		//Questo serve al
 		} catch(RemoteException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 
 }

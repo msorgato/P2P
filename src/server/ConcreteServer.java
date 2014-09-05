@@ -11,7 +11,7 @@ import client.Client;
 
 public class ConcreteServer extends UnicastRemoteObject implements Server {
 	private String name;
-	private Vector<ClientRegistry> registry = new Vector<ClientRegistry>();
+	private ArrayList<ClientRegistry> registry = new ArrayList<ClientRegistry>();
 	private Vector<Server> servers;
 	private static final String HOST = "localhost";
 	
@@ -100,12 +100,23 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		*	stesso nome non possano connettersi a questo o ad altri
 		*	server?
 		*/
-		String res = c.getResources();
-		synchronized(registry) {
-			registry.add(new ClientRegistry(c, res));
+		String res;
+		try {
+			res = c.getResources();
+		} catch(RemoteException e) {
+			//Il Client non è raggiungibile
+			return false;
 		}
-		System.out.println("Client " + c.getName() + " connesso.");
-		return false;
+		synchronized(registry) {
+			registry.add(new ClientRegistry(c, res));	//se arriva ad eseguire questa istruzione, res è stato ottenuto correttamente
+			try {
+				System.out.println("Client " + c.getName() + " connesso.");
+			} catch(RemoteException ex) {	//Problemi di connessione remota
+				registry.remove(registry.size());
+				return false;
+			}
+		}
+		return true;	//ha inserito correttamente il registro del Client e non sono apparsi errori di connessione
 	}
 
 	@Override

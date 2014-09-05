@@ -34,6 +34,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			server = (Server) Naming.lookup("rmi://" + HOST + "/" + sName);
 		} catch(RemoteException ex) {
 			ex.printStackTrace();
+			System.out.println("Probabilmente non è stato pubblicizzato un Server con nome " + sName);
 			//probabilmente il server non e' stato pubblicato
 		} 
 		catch(NotBoundException e) {

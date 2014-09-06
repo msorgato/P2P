@@ -69,7 +69,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	}
 	
 	@Override
-	public Client[] searchResource(String name, int parts) throws RemoteException {
+	public ArrayList<Client> searchResource(String name, int parts) throws RemoteException {
 		ArrayList<Client> cli = new ArrayList<Client>();
 		synchronized(registry) {
 			for(int i = 0; i < registry.size(); i++) {
@@ -78,7 +78,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			}
 		}
 		//qui gestisci la richiesta ad altri server per altri client
-		return (Client[]) cli.toArray();
+		return cli;
 	}
 
 	@Override

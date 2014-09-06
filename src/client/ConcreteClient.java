@@ -100,7 +100,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{
 		try {
-			Client[] clients = server.searchResource(nm, prts);	//altra merda di Vector
+			ArrayList<Client> clients = (ArrayList<Client>)server.searchResource(nm, prts);
+			//DOMANDA DA UN MILIONE DI DOLLARI: IL CAST SERVE SUL SERIO O E' UNA MIA FISIMA???
 		} catch(RemoteException e) {
 			//il server e' andato. come si fa?
 		}
@@ -111,6 +112,19 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
 		//visto che il registro che ha il server è una copia serializzata della lista locale
 	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			if(connected)
+				server.disconnect(this);
+		} catch(RemoteException e) {
+			System.out.println("Alla disconnessione del Client " + name + ", anche il Server ha presentato problemi");
+		}
+	}
+	/*
+	 * Semplice funzione che invoca, quando l'oggetto viene deallocato, un'ulteriore chiusura delle connessioni "soft".
+	 */
 
 }
 

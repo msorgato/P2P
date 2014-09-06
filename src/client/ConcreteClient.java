@@ -20,7 +20,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
 		
 	private class Report {
-		/*	QUI ci va la classe che tiene conto di tutte le risorse scaricate da altri client.
+		/*	
+		*	QUI ci va la classe che tiene conto di tutte le risorse scaricate da altri client.
 		*	Per ogni parte di risorsa, quanti e quali client hanno scaricato quella	
 		*	risorsa.
 		*/
@@ -29,13 +30,13 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	protected ConcreteClient(String cName, int maxD, ArrayList<Resource> res, String sName) throws RemoteException {	
 		name = cName;
 		maxDownloads = maxD;
-		resources = res;		//<-----Vector da cambiare
+		resources = res;
 		try {
 			server = (Server) Naming.lookup("rmi://" + HOST + "/" + sName);
 		} catch(RemoteException ex) {
 			ex.printStackTrace();
 			System.out.println("Probabilmente non è stato pubblicizzato un Server con nome " + sName);
-			//probabilmente il server non e' stato pubblicato
+			//probabilmente il server non è stato pubblicato
 		} 
 		catch(NotBoundException e) {
 			e.printStackTrace();
@@ -90,7 +91,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	}	//in questo metodo ci va anche l'update del Report alla fine dell'invio della parte della Risorsa.
 
 	@Override
-	public boolean download(String nm, int prts) {
+	public boolean download(String nm, int prts) throws RemoteException{
 		try {
 			Client[] clients = server.searchResource(nm, prts);	//altra merda di Vector
 		} catch(RemoteException e) {

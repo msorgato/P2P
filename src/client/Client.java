@@ -12,5 +12,5 @@ public interface Client extends Remote {
 	public ResourceFragment sendResourceFragment(String nm, int prts, int frgm, Client c) throws RemoteException;	
 	//questo metodo manda una parte di risorsa, non una risorsa intera!
 	
-	public boolean download(String nm, int prts);
+	public boolean download(String nm, int prts) throws RemoteException;
 }

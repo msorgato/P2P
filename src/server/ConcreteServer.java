@@ -23,7 +23,8 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			client = c;
 			String[] resArray = res.split("|");
 			for(int i = 0; i < resArray.length; i++) 
-				resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.	
+				resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
+			//OCCHIO, questo accesso non è sincronizzato
 		}	
 		
 		private boolean addClientResource(String name, int parts) {
@@ -47,13 +48,13 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	}
 	
 	protected ConcreteServer(String nm, ArrayList<Server> sr) throws RemoteException {
-		super();
 		name = nm;
 		servers = sr;
 		String rmiPublish = "rmi://" + HOST + "/" + name;
 		try {
 			Naming.rebind(rmiPublish, this);		
 		} catch(RemoteException e) {
+			System.out.println("Lancia una RemoteException");
 			e.printStackTrace();
 		}
 		catch(MalformedURLException exc) {
@@ -116,6 +117,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				return false;
 			}
 		}
+		System.out.println(res);
 		return true;	//ha inserito correttamente il registro del Client e non sono apparsi errori di connessione
 	}
 

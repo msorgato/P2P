@@ -5,7 +5,6 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import client.Client;
 
@@ -17,14 +16,15 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	
 	private class ClientRegistry {
 		private Client client;
-		private Vector<String> resources = new Vector<String>(); 
+		private ArrayList<String> resources = new ArrayList<String>(); 
 		
 		private ClientRegistry(Client c, String res) { 
 			client = c;
 			String[] resArray = res.split("|");
-			for(int i = 0; i < resArray.length; i++) 
-				resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
-			//OCCHIO, questo accesso non è sincronizzato
+			synchronized(resources) {
+				for(int i = 0; i < resArray.length; i++) 
+					resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
+			}
 		}	
 		
 		private boolean addClientResource(String name, int parts) {
@@ -35,6 +35,8 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			}
 			return true;	
 		}
+		//funzione utilizzata dal Server per aggiungere una risorsa in caso di scaricamento
+		
 		private boolean isResHere(String name, int parts) {
 			synchronized(resources) {
 				for(int i = 0; i < resources.size(); i++) {
@@ -45,6 +47,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			}
 			return false;
 		}
+		//funzione utilizzata per stablire se un Client sia in possesso di una determinata risorsa
 	}
 	
 	protected ConcreteServer(String nm, ArrayList<Server> sr) throws RemoteException {
@@ -54,10 +57,12 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		try {
 			Naming.rebind(rmiPublish, this);		
 		} catch(RemoteException e) {
-			System.out.println("Lancia una RemoteException");
+			System.out.println("L'invocazione del metodo rebind del Server " + name + " lancia una RemoteException");
 			e.printStackTrace();
+			throw new RemoteException();
 		}
 		catch(MalformedURLException exc) {
+			System.out.println("L'invocazione del metdo rebind lancia una MalformedURLException");
 			exc.printStackTrace();
 		}
 		System.out.println("Server " + name + " pubblicizzato");

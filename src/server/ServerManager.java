@@ -9,8 +9,9 @@ private static ArrayList<Server> servers = new ArrayList<Server>();		//Questo se
 	
 	public static void main(String[] args) {
 		//System.out.println("Current working directory: " + System.getProperty("user.dir"));
+		Server razor;
 		try {
-			ConcreteServer razor = new ConcreteServer("Razorback", servers);
+			razor = new ConcreteServer("Razorback", servers);
 		} catch(RemoteException e) {
 			e.printStackTrace();
 		}

@@ -54,15 +54,15 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			return;
 		}
 		try {
-			server.connect(this);
+			connected = server.connect(this);
 			System.out.println("Connesso al server " + server.getName());
 		} catch(RemoteException ecc) {
 			System.out.println("La connessione al server " + sName + " è caduta");
 		}
 		catch(Exception exc) {
+			connected = false;
 			return;
 		}
-		connected = true;
 	}
 	
 

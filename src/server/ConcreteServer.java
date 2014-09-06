@@ -138,12 +138,14 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			return false;
 		}
 	}
+	//funzione chiamata da un client connesso al server per richiedere la disconnessione e la seguente cancellazione 
+	//del registro a lui legato
 
 }
 
 /*
 *	Il metodo searchResource(blabla) dovrà ritornare al Client l'ArrayList (o un array normale) contenente
-*	i Client che possiedono la risorsa cercata dal chiamante.
+*	i Client che possiedono la risorsa cercata dal chiamante. Ovviamente saranno tutti array di riferimenti Remote.
 *
 *	NOTA BENE: Se il Client e il Server di un'applicazione distrbuita risiedono sulla stessa JVM, quando il Client
 *	invoca un metodo che dovrebbe essere remoto, sul Server non viene aperto automaticamente un nuovo Thread. OCCHIO.

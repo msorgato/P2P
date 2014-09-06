@@ -16,6 +16,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private ArrayList<Resource> resources;		//<----CAMBIA
 	private Report report = new Report();
 	private Server server;
+	private boolean connected = false;
 	private static final String HOST = "localhost";
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
 		
@@ -35,8 +36,9 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			server = (Server) Naming.lookup("rmi://" + HOST + "/" + sName);
 		} catch(RemoteException ex) {
 			ex.printStackTrace();
-			System.out.println("Probabilmente non è stato pubblicizzato un Server con nome " + sName);
+			System.out.println("Sono stati riscontrati dei problemi nel raggiungimento del server " + sName);
 			//probabilmente il server non è stato pubblicato
+			//oppure RMI non è stato lanciato
 		} 
 		catch(NotBoundException e) {
 			e.printStackTrace();
@@ -45,14 +47,22 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		}
 		catch(MalformedURLException exc) {
 			exc.printStackTrace();
-			System.out.println("Client " + name + " pribabilmente non trova il server perché l'indirizzo è sbagliato");
+			System.out.println("Client " + name + " pribabilmente non trova il server " + sName + " perché l'indirizzo è sbagliato");
+		}
+		catch(Exception exc) {
+			System.out.println("Connessione non avvenuta. Uscita dal programma.");
+			return;
 		}
 		try {
-			server.connect(this); 		//ciccia, ce se prova. se ce la fa, oro.
+			server.connect(this);
+			System.out.println("Connesso al server " + server.getName());
 		} catch(RemoteException ecc) {
-			System.out.println("I casi sono due, penso: o il metodo e' sbagliato, o ha preso il riferimento e questo non funzia piu.");
+			System.out.println("La connessione al server " + sName + " è caduta");
 		}
-		System.out.println("Connesso al server " + server.getName());
+		catch(Exception exc) {
+			return;
+		}
+		connected = true;
 	}
 	
 
@@ -70,22 +80,19 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			return res;
 		}
 	}
-	/*
-	* In questo metodo ci sono un casino di riferimenti al Vector da cambiare
-	*/
 
 	@Override
 	public ResourceFragment sendResourceFragment(String nm, int prts, int frgm, Client c) throws RemoteException {
 		int resourceIndex = -1;		
-		synchronized(c) {	//questo mi da un altro controllo di non inviare piu' risorse allo stesso client
-			synchronized(resources) {	//occhio al deadlock ed a cambiare il Vector
+		synchronized(c) {	//questo mi da un ulteriore controllo lato client di non inviare piu' risorse allo stesso client
+			synchronized(resources) {	
 				for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
-					if(resources.get(i).equalsResource(nm, prts))	//idem di sopra
+					if(resources.get(i).equalsResource(nm, prts))	
 						resourceIndex = i;
 				}
 				if(resourceIndex == -1)
 					return null;
-				return resources.get(resourceIndex).getFragment(frgm);	//idem qui
+				return resources.get(resourceIndex).getFragment(frgm);	
 			}	
 		}
 	}	//in questo metodo ci va anche l'update del Report alla fine dell'invio della parte della Risorsa.
@@ -101,7 +108,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		//il notify() alla fine del download è la chiave.
 		//in piu', io ci metterei anche un bel Downloader.downloading = 0; alla fine.
 		return false;
-		//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client
+		//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
+		//visto che il registro che ha il server è una copia serializzata della lista locale
 	}
 
 }

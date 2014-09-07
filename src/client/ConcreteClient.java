@@ -21,11 +21,13 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
 		
 	private class Report {
-		/*	
-		*	QUI ci va la classe che tiene conto di tutte le risorse scaricate da altri client.
-		*	Per ogni parte di risorsa, quanti e quali client hanno scaricato quella	
-		*	risorsa.
-		*/
+		ArrayList<String> report = new ArrayList();
+		private synchronized void addReport(String Client, String resName, String resParts) {
+			report.add(Client + " " + resName + " " + resParts);
+		}
+		private synchronized ArrayList<String> getReport() {
+			return report;
+		}
 	}
 	
 	protected ConcreteClient(String cName, int maxD, ArrayList<Resource> res, String sName) throws RemoteException {	
@@ -112,6 +114,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		return false;
 		//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
 		//visto che il registro che ha il server è una copia serializzata della lista locale
+		
+		//in più, qui si richiama il metodo addReport della classe interna per aggiornare il Report
 	}
 	
 	@Override

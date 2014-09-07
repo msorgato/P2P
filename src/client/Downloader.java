@@ -1,15 +1,15 @@
 package client;
 
 import java.rmi.RemoteException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class Downloader {
 	private	String resourceName;
 	private int resourceParts;
 	private int maxDownloads;
 	private Client clientDownloading;
-	private Vector<Client> clients;		//Vector da eliminare
-	private Vector<ResourceFragment> fragments = new Vector<ResourceFragment>();	//altro Vector da eliminare
+	private ArrayList<Client> clients;		
+	private ArrayList<ResourceFragment> fragments = new ArrayList<ResourceFragment>();
 	private Downloading downloading = new Downloading();
 	
 	private class Downloading {
@@ -26,7 +26,7 @@ public class Downloader {
 
 		private DownloadFragment(int f) { 
 			synchronized(clients) {
-				client = clients.remove(0);		//riferimenti di Vector
+				client = clients.remove(0);		
 			} 
 			fragment = f;
 			start();
@@ -39,7 +39,7 @@ public class Downloader {
 					fragToDownload = client.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
 				} catch(RemoteException e) {
 					synchronized(clients) {
-						if(!clients.isEmpty())	//idem
+						if(!clients.isEmpty())	
 							client = clients.remove(0);
 						else	//ho finito i client da cui ricevere la risorsa
 							return; 
@@ -59,7 +59,7 @@ public class Downloader {
 		} 
 	}
 	
-	public Downloader(String nm, int prts, int maxDown, Vector<Client> cls, Client cl) { 
+	public Downloader(String nm, int prts, int maxDown, ArrayList<Client> cls, Client cl) { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;

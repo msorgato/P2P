@@ -75,6 +75,24 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	
 	@Override
 	public ArrayList<Client> searchResource(String name, int parts) throws RemoteException {
+		ArrayList<Client> cli = this.searchClient(name, parts);
+		synchronized(servers) {
+			for(int i = 0; i < servers.size(); i++) {
+				ArrayList<Client> otherCli = new ArrayList<Client>();
+				try {
+					otherCli.addAll(servers.get(i).searchClient(name, parts));
+				} catch(RemoteException e) {	//Un server nella lista si è disconnesso o ha avuto problemi
+					servers.remove(i);
+					continue;	//salta la concatenazione dei client provenienti dall'ultimo Server ed esegue l'iterata successiva
+				}
+				cli.addAll(otherCli);
+			}
+		}
+		return cli;
+	}
+	
+	@Override
+	public ArrayList<Client> searchClient(String name, int parts) throws RemoteException {
 		ArrayList<Client> cli = new ArrayList<Client>();
 		synchronized(registry) {
 			for(int i = 0; i < registry.size(); i++) {
@@ -82,7 +100,6 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 					cli.add(registry.get(i).client);
 			}
 		}
-		//qui gestisci la richiesta ad altri server per altri client
 		return cli;
 	}
 

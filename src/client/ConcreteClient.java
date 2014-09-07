@@ -104,6 +104,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			//DOMANDA DA UN MILIONE DI DOLLARI: IL CAST SERVE SUL SERIO O E' UNA MIA FISIMA???
 		} catch(RemoteException e) {
 			//il server e' andato. come si fa?
+			connected = false;
 		}
 		//QUI si richiama il metodo di Downloader che ritorna la risorsa.
 		//il notify() alla fine del download è la chiave.

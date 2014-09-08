@@ -8,45 +8,40 @@ public class Downloader {
 	private int resourceParts;
 	private int maxDownloads;
 	private int downloading = 0;
-	private Integer processed = new Integer(0);
+	private int processed = 0;
 	private Client clientDownloading;
 	private ArrayList<Client> clients;		
 	private ArrayList<ResourceFragment> fragments;
 	
 	private class DownloadFragment extends Thread {
 		private Client target;
-		private Client calling;
 		private int fragment;
 		private ResourceFragment fragToDownload = null;
 
-		private DownloadFragment(int fragment, Client target, Client calling) { 
+		private DownloadFragment(int fragment, Client target) { 
 			this.target = target;
-			this.calling = calling;
 			this.fragment = fragment;
 			start();
 		}
 		
 		public void run() {
-			while(fragToDownload == null) {
-				try {
-					fragToDownload = client.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
-				} catch(RemoteException e) {
-					synchronized(clients) {
-						if(!clients.isEmpty())	
-							client = clients.remove(0);
-						else	//ho finito i client da cui ricevere la risorsa
-							return; 
-					}
+			try {
+				fragToDownload = target.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
+			} catch(RemoteException e) {
+				target = null;
+				fragToDownload = null;
+			}
+			synchronized(Downloader.this) {
+				if(!(target == null)) {
+					clients.add(target);
 				}
+				downloading--;
+				notify();
 			}
 			synchronized(fragments) {
-				fragments.add(fragment, fragToDownload);
-			}		
-			synchronized(clients) {
-				clients.add(client);
-			}
-			synchronized(downloading) {	//qui ci andrebbe il notify su Downloader.this
-				downloading.remove();
+				if(!(fragToDownload == null))
+					fragments.add(fragment - 1, fragToDownload);
+				processed++;
 				notify();
 			}
 		} 
@@ -74,10 +69,10 @@ public class Downloader {
 					}
 				}
 				downloading++;
-				new DownloadFragment(i, clients.remove(0), clientDownloading);
+				new DownloadFragment(i, clients.remove(0));
 			}
 		}
-		synchronized(processed) {
+		synchronized(fragments) {
 			while(processed < resourceParts)
 				try {
 					wait();	//aspetto che tutti i download iniziali finiscano
@@ -86,7 +81,8 @@ public class Downloader {
 				}
 		}
 		
-		
+		//QUI sono finiti tutti i download. chiamo Resource.check() per vedere se è tutto ok.
+		//metto il check in un ciclo, che esce solo quando check ritorna -1 oppure se non ci sono più client da cui scaricare.
 		
 		
 		

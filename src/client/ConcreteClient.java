@@ -111,16 +111,14 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 					return false;
 				}
 				synchronized(downloadMonitor) {
-					Downloader downloader = new Downloader(nm, prts, clients, maxDownloads);
-					ResourceFragments[] res = downloader.process();
-				
-					if(Resource.check(res, nm, prts) == -1) {
-						/*
-						 * ISTRUZIONI PER L'INSERIMENTO DELLA RISORSA
-						 */
-						return true;
+					Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads);
+					Resource res = downloader.process();
+					if(res == null) {
+						//CASINO: IL DOWNLOAD E' FALLITO
+					
 					}
 					else
+						
 					//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
 					//visto che il registro che ha il server è una copia serializzata della lista locale
 				

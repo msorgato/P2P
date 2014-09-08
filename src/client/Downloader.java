@@ -7,6 +7,7 @@ public class Downloader {
 	private	String resourceName;
 	private int resourceParts;
 	private int maxDownloads;
+	private Client clientDownloading;
 	private ArrayList<Client> clients;		
 	private ArrayList<ResourceFragment> fragments = new ArrayList<ResourceFragment>();
 	
@@ -24,7 +25,6 @@ public class Downloader {
 		}
 		
 		public void run() {
-			downloading.add();
 			while(fragToDownload == null) {
 				try {
 					fragToDownload = client.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
@@ -50,12 +50,14 @@ public class Downloader {
 		} 
 	}
 	
-	public Downloader(String nm, int prts, ArrayList<Client> cls, int maxDown) { 
+	public Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;
 		clients = cls; 
+		this.clientDownloading = clientDownloading;
 	} 
+	
 	public Resource process() {
 		for(int i = 1; i < resourceParts && !clients.isEmpty(); i++) {
 			while(downloading.getCurrent() <= maxDownloads) {

@@ -14,6 +14,7 @@ private static ArrayList<Server> servers = new ArrayList<Server>();		//Questo se
 			razor = new ConcreteServer("Razorback", servers);
 		} catch(RemoteException e) {
 			e.printStackTrace();
+			System.out.println("Probabilmente il registro RMI non è stato avviato");
 		}
 	}
 

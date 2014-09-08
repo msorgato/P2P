@@ -7,17 +7,8 @@ public class Downloader {
 	private	String resourceName;
 	private int resourceParts;
 	private int maxDownloads;
-	private Client clientDownloading;
 	private ArrayList<Client> clients;		
 	private ArrayList<ResourceFragment> fragments = new ArrayList<ResourceFragment>();
-	private Downloading downloading = new Downloading();
-	
-	private class Downloading {
-		private int current = 0;
-		public synchronized void add() { current++; }
-		public synchronized void remove() { current--; }
-		public synchronized int getCurrent() { return current; }
-	}
 	
 	private class DownloadFragment extends Thread {
 		private Client client;
@@ -59,12 +50,11 @@ public class Downloader {
 		} 
 	}
 	
-	public Downloader(String nm, int prts, int maxDown, ArrayList<Client> cls, Client cl) { 
+	public Downloader(String nm, int prts, ArrayList<Client> cls, int maxDown) { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;
 		clients = cls; 
-		clientDownloading = cl; 
 	} 
 	public Resource process() {
 		for(int i = 1; i < resourceParts && !clients.isEmpty(); i++) {

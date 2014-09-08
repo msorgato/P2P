@@ -166,4 +166,6 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 *
 *	NOTA BENE: Se il Client e il Server di un'applicazione distrbuita risiedono sulla stessa JVM, quando il Client
 *	invoca un metodo che dovrebbe essere remoto, sul Server non viene aperto automaticamente un nuovo Thread. OCCHIO.
+*
+*	gestire la connessione di un nuovo server, deve notificare agli altri server online di aggiornare la loro lista dei server attivi
 */

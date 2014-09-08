@@ -13,7 +13,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 
 	private String name;
 	private int maxDownloads;
-	private ArrayList<Resource> resources;		//<----CAMBIA
+	private Object downloadMonitor = new Object();
+	private ArrayList<Resource> resources;		
 	private Report report = new Report();
 	private Server server;
 	private boolean connected = false;
@@ -67,7 +68,6 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		}
 	}
 	
-
 	@Override
 	public String getName() throws RemoteException {
 		return name;
@@ -86,36 +86,49 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	@Override
 	public ResourceFragment sendResourceFragment(String nm, int prts, int frgm, Client c) throws RemoteException {
 		int resourceIndex = -1;		
-		synchronized(c) {	//questo mi da un ulteriore controllo lato client di non inviare piu' risorse allo stesso client
-			synchronized(resources) {	
-				for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
-					if(resources.get(i).equalsResource(nm, prts))	
-						resourceIndex = i;
-				}
-				if(resourceIndex == -1)
-					return null;
-				return resources.get(resourceIndex).getFragment(frgm);	
-			}	
-		}
+		synchronized(resources) {	
+			for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
+				if(resources.get(i).equalsResource(nm, prts))	
+					resourceIndex = i;
+			}
+			if(resourceIndex == -1)
+				return null;
+			return resources.get(resourceIndex).getFragment(frgm);	
+		}	
 	}	//in questo metodo ci va anche l'update del Report alla fine dell'invio della parte della Risorsa.
 
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{
-		try {
-			ArrayList<Client> clients = (ArrayList<Client>)server.searchResource(nm, prts);
-			//DOMANDA DA UN MILIONE DI DOLLARI: IL CAST SERVE SUL SERIO O E' UNA MIA FISIMA???
-		} catch(RemoteException e) {
-			//il server e' andato. come si fa?
-			connected = false;
+		if(connected) {
+			boolean completed = false;
+			while(!completed) {
+				ArrayList<Client> clients;
+				try {
+					clients = server.searchResource(nm, prts);
+				} catch(RemoteException e) {
+					//il server e' andato. come si fa?
+					connected = false;
+					return false;
+				}
+				synchronized(downloadMonitor) {
+					Downloader downloader = new Downloader(nm, prts, clients, maxDownloads);
+					ResourceFragments[] res = downloader.process();
+				
+					if(Resource.check(res, nm, prts) == -1) {
+						/*
+						 * ISTRUZIONI PER L'INSERIMENTO DELLA RISORSA
+						 */
+						return true;
+					}
+					else
+					//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
+					//visto che il registro che ha il server è una copia serializzata della lista locale
+				
+					//in più, qui si richiama il metodo addReport della classe interna per aggiornare il Report
+				}
+			}
 		}
-		//QUI si richiama il metodo di Downloader che ritorna la risorsa.
-		//il notify() alla fine del download è la chiave.
-		//in piu', io ci metterei anche un bel Downloader.downloading = 0; alla fine.
 		return false;
-		//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
-		//visto che il registro che ha il server è una copia serializzata della lista locale
-		
-		//in più, qui si richiama il metodo addReport della classe interna per aggiornare il Report
 	}
 	
 	@Override

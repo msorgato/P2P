@@ -26,7 +26,7 @@ public class Resource {
 					return i;
 			}	
 		} catch(ArrayIndexOutOfBoundsException e) {	//ho meno frammenti di risorsa di quanti me ne servissero
-			return -2;			
+			return -2;			//questo controllo non serve più
 		}
 		return -1;					//system all green
 	}

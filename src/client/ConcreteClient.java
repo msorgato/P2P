@@ -13,7 +13,6 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 
 	private String name;
 	private int maxDownloads;
-	private Object downloadMonitor = new Object();
 	private ArrayList<Resource> resources;		
 	private Report report = new Report();
 	private Server server;
@@ -22,9 +21,9 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
 		
 	private class Report {
-		ArrayList<String> report = new ArrayList();
-		private synchronized void addReport(String Client, String resName, String resParts) {
-			report.add(Client + " " + resName + " " + resParts);
+		ArrayList<String> report = new ArrayList<String>();
+		private synchronized void addReport(String Client, String resName, String resParts, String resPart) {
+			report.add(Client + " " + resName + " " + resParts + " " + resPart);
 		}
 		private synchronized ArrayList<String> getReport() {
 			return report;
@@ -85,6 +84,11 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 
 	@Override
 	public ResourceFragment sendResourceFragment(String nm, int prts, int frgm, Client c) throws RemoteException {
+		try {
+			Thread.sleep(SLEEPTIME);
+		} catch(InterruptedException e) {
+			//lo sleep si è interrotto
+		}
 		int resourceIndex = -1;		
 		synchronized(resources) {	
 			for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
@@ -93,39 +97,41 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			}
 			if(resourceIndex == -1)
 				return null;
+			try {
+				report.addReport(c.getName(), nm, Integer.toString(prts), Integer.toString(frgm));
+			} catch(RemoteException e) {
+				
+			}
 			return resources.get(resourceIndex).getFragment(frgm);	
 		}	
 	}	//in questo metodo ci va anche l'update del Report alla fine dell'invio della parte della Risorsa.
 
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{
-		/*if(connected) {
-			boolean completed = false;
-			while(!completed) {
-				ArrayList<Client> clients;
-				try {
-					clients = server.searchResource(nm, prts);
-				} catch(RemoteException e) {
-					//il server e' andato. come si fa?
-					connected = false;
-					return false;
-				}
-				synchronized(downloadMonitor) {
-					Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads);
-					Resource res = downloader.process();
-					if(res == null) {
-						//CASINO: IL DOWNLOAD E' FALLITO
-					
-					}
-					else
-						
-					//ci manca anche il metodo di update del registro del server con la lista delle risorse di ogni client,
-					//visto che il registro che ha il server è una copia serializzata della lista locale
-				
-					//in più, qui si richiama il metodo addReport della classe interna per aggiornare il Report
-				}
+		if(connected) {
+			ArrayList<Client> clients;
+			try {
+				clients = server.searchResource(nm, prts);
+			} catch(RemoteException e) {
+				connected = false;
+				return false;
 			}
-		}*/
+			Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads);
+			Resource resToAdd = downloader.process();
+			if(resToAdd == null) {
+				//QUI abbiamo un bel problema: non siamo riusciti a scaricare la risorsa che ci serviva
+				return false;
+			}
+			synchronized(resources) {
+				resources.add(resToAdd);
+			}
+			try {
+				server.addResource(this, nm, prts);
+			} catch(RemoteException e) {
+				connected = false;
+			}
+			return true;
+		}
 		return false;
 	}
 	

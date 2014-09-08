@@ -83,22 +83,20 @@ public class Downloader {
 		
 		//QUI sono finiti tutti i download. chiamo Resource.check() per vedere se è tutto ok.
 		//metto il check in un ciclo, che esce solo quando check ritorna -1 oppure se non ci sono più client da cui scaricare.
-		
-		
-		
-		
-		synchronized(fragments) {
-			while(fragments.size() < resourceParts && !clients.isEmpty())
+		int fragmentFailure = Resource.check((ResourceFragment[])fragments.toArray(), resourceName, resourceParts);
+		while(fragmentFailure != -1 && !(clients.isEmpty())) {
+			synchronized(fragments) {
+				new DownloadFragment(fragmentFailure, clients.remove(0));
 				try {
-					wait();
-				} catch(InterruptedException e) {
-					//il downloader e' stato interrotto mentre aspettava la fine dei download
+					wait();		//aspetto che lo scaricamento del frammento erroneo abbia fine
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
+				fragmentFailure = Resource.check((ResourceFragment[])fragments.toArray(), resourceName, resourceParts);
+			}
 		}
-		if(fragments.size() < resourceParts)
+		if(fragmentFailure != -1)
 			return null;
 		return new Resource(resourceName, resourceParts, (ResourceFragment[])fragments.toArray());
 	}
-	//alla fine dello scaricamento dovrò richiamare il metodo statico di Resource per vedere se
-	//tutti i frammenti che mi sono stati inviati sono ok.
 }

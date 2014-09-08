@@ -7,20 +7,22 @@ public class Downloader {
 	private	String resourceName;
 	private int resourceParts;
 	private int maxDownloads;
+	private int downloading = 0;
+	private Integer processed = new Integer(0);
 	private Client clientDownloading;
 	private ArrayList<Client> clients;		
-	private ArrayList<ResourceFragment> fragments = new ArrayList<ResourceFragment>();
+	private ArrayList<ResourceFragment> fragments;
 	
 	private class DownloadFragment extends Thread {
-		private Client client;
+		private Client target;
+		private Client calling;
 		private int fragment;
 		private ResourceFragment fragToDownload = null;
 
-		private DownloadFragment(int f) { 
-			synchronized(clients) {
-				client = clients.remove(0);		
-			} 
-			fragment = f;
+		private DownloadFragment(int fragment, Client target, Client calling) { 
+			this.target = target;
+			this.calling = calling;
+			this.fragment = fragment;
 			start();
 		}
 		
@@ -43,7 +45,7 @@ public class Downloader {
 			synchronized(clients) {
 				clients.add(client);
 			}
-			synchronized(downloading) {
+			synchronized(downloading) {	//qui ci andrebbe il notify su Downloader.this
 				downloading.remove();
 				notify();
 			}
@@ -56,21 +58,39 @@ public class Downloader {
 		maxDownloads = maxDown;
 		clients = cls; 
 		this.clientDownloading = clientDownloading;
+		fragments = new ArrayList<ResourceFragment>(prts);
 	} 
 	
 	public Resource process() {
-		for(int i = 1; i < resourceParts && !clients.isEmpty(); i++) {
-			while(downloading.getCurrent() <= maxDownloads) {
-				synchronized(downloading) {
+		for(int i = 1; i <= resourceParts; i++) {
+			synchronized(this) {
+				while(downloading == maxDownloads || clients.isEmpty()) {
+					if(downloading == 0 && clients.isEmpty())
+						return null;	//se non c'è nessun thread che sta scaricando e ho finito i client, non posso scaricare la risorsa
 					try {
 						wait();
 					} catch(InterruptedException e) {
-						//il downloader e' stato interrotto mentre aspettava di creare altri thread
+						//Thread arrestato mentre aspettava di lanciare altri download
 					}
 				}
+				downloading++;
+				new DownloadFragment(i, clients.remove(0), clientDownloading);
 			}
-			new DownloadFragment(i); 
 		}
+		synchronized(processed) {
+			while(processed < resourceParts)
+				try {
+					wait();	//aspetto che tutti i download iniziali finiscano
+				} catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+		}
+		
+		
+		
+		
+		
+		
 		synchronized(fragments) {
 			while(fragments.size() < resourceParts && !clients.isEmpty())
 				try {

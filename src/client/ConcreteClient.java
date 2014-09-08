@@ -99,7 +99,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{
-		if(connected) {
+		/*if(connected) {
 			boolean completed = false;
 			while(!completed) {
 				ArrayList<Client> clients;
@@ -125,7 +125,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 					//in più, qui si richiama il metodo addReport della classe interna per aggiornare il Report
 				}
 			}
-		}
+		}*/
 		return false;
 	}
 	

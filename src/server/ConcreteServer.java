@@ -21,12 +21,12 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		
 		private ClientRegistry(Client c, String res) { 
 			client = c;
-			String[] resArray = res.split("|");
+			String[] resArray = res.split(":");
+			System.out.println(resArray[0]);
+			System.out.println(res);
 			synchronized(resources) {
 				for(int i = 0; i < resArray.length; i++) 
 					resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
-				for(int i = 0; i < resArray.length; i++)
-					System.out.println(resources.get(i));
 			}
 		}	
 		
@@ -173,6 +173,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			//Il Client non è raggiungibile
 			return false;
 		}
+		System.out.println(res);
 		synchronized(registry) {
 			registry.add(new ClientRegistry(c, res));	//se arriva ad eseguire questa istruzione, res è stato ottenuto correttamente
 			try {

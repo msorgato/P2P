@@ -77,7 +77,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		synchronized(resources) {		
 			String res = resources.get(0).getName() + " " + resources.get(0).getParts(); 
 			for(int i = 1; i < resources.size(); i++) 
-				res = res + "|" + resources.get(i).getName() + " " + resources.get(i).getParts(); //splittare la stringa usando il carattere "|" come guardia
+				res = res + ":" + resources.get(i).getName() + " " + resources.get(i).getParts(); //splittare la stringa usando il carattere ":" come guardia
 			return res;
 		}
 	}

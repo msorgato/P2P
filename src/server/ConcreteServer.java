@@ -51,7 +51,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		//funzione utilizzata per stablire se un Client sia in possesso di una determinata risorsa
 	}
 	
-	protected ConcreteServer(String nm) throws RemoteException {
+	protected ConcreteServer(String nm) throws RemoteException, AlreadyBoundedException {
 		name = nm;
 		String[] serverNames = null;
 		try {
@@ -60,17 +60,24 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			e1.printStackTrace();
 			System.out.println("Eccezione lanciata dal metodo list di Naming");
 		}
+		if(serverNames != null) {
+			for(int i = 0; i < serverNames.length; i++)
+				if(serverNames[i].contains(nm))
+					throw new AlreadyBoundedException();
+		}
 		String rmiPublish = "rmi://" + HOST + "/" + name;
 		try {
 			Naming.rebind(rmiPublish, this);		
 		} catch(RemoteException e) {
 			System.out.println("L'invocazione del metodo rebind del Server " + name + " lancia una RemoteException");
 			e.printStackTrace();
-			throw new RemoteException();
 		}
 		catch(MalformedURLException exc) {
 			System.out.println("L'invocazione del metdo rebind lancia una MalformedURLException");
 			exc.printStackTrace();
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
 		}
 		System.out.println("Server " + name + " pubblicizzato");
 		if(!(serverNames == null)) {
@@ -79,12 +86,14 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				try {
 					srvr = (Server) Naming.lookup(serverNames[i]);
 				} catch(RemoteException ex) {
+					ex.printStackTrace();
 					//GESTISCI
 				} catch(MalformedURLException ecc) {
+					ecc.printStackTrace();
 					//GESTISCI
 				} catch (NotBoundException e) {
-					//GESTISCI
 					e.printStackTrace();
+					//GESTISCI
 				}
 				if(srvr != null) {
 					synchronized(servers) {
@@ -92,7 +101,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 							if(srvr.connectServer(this))
 								servers.add(srvr);
 						} catch(RemoteException e) {
-							continue;
+							e.printStackTrace();
 						}
 					}
 				}
@@ -184,7 +193,8 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			try {
 				System.out.println("Server " + s.getName() + " connesso al Server " + this.name);
 			} catch(RemoteException e) {
-				
+				//Gestisci l'eccezione
+				e.printStackTrace();
 			}
 		}
 		return true;

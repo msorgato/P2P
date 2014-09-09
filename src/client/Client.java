@@ -9,6 +9,8 @@ public interface Client extends Remote {
 	public String getResources() throws RemoteException;  	
 	//metodo che crea una stringa con una formattazione precisa contenente le risorse in proprio possesso
 	
+	public void ping() throws RemoteException;
+	
 	public void requestFragment(String nm, int prts, int frgm, Downloader d, Client c) throws RemoteException;	
 	
 	public boolean download(String nm, int prts) throws RemoteException;

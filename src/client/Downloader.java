@@ -25,29 +25,60 @@ public class Downloader implements Remote {
 		}
 		
 		public void run() {
+			boolean requestSent = false;
+			while(!requestSent) {
+				try {
+					target.requestFragment(resourceName, resourceParts, fragment, Downloader.this, clientDownloading);
+				} catch(RemoteException e) {
+					target = null;
+				}
+				if(target == null)
+					synchronized(clients) {
+						
+					}
+			}
 			try {
-				fragToDownload = target.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
+				target.requestFragment(resourceName, resourceParts, fragment, Downloader.this, clientDownloading);
 			} catch(RemoteException e) {
 				target = null;
-				fragToDownload = null;
-			}
-			synchronized(Downloader.this) {
-				if(!(target == null)) {
-					clients.add(target);
-				}
-				downloading--;
-				notify();
-			}
-			synchronized(fragments) {
-				if(!(fragToDownload == null))
-					fragments.add(fragment - 1, fragToDownload);
-				processed++;
-				notify();
 			}
 		} 
 	}
 	
-	public Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) throws RemoteException { 
+	private class Receiver extends Thread {
+		ResourceFragment fragment = null;
+		Client client = null;
+		
+		private Receiver(ResourceFragment fragment, Client client) {
+			this.fragment = fragment;
+			this.client = client;
+			start();
+		}
+		
+		public void run() {
+			synchronized(fragments) {
+				fragments.add(fragment.getPart() - 1, fragment);
+			}
+			synchronized(clients) {
+				try {
+					client.ping();
+				} catch(RemoteException e) {
+					client = null;
+				}
+				if(client != null) {
+					clients.add(client);
+					notifyAll();
+				}
+			}
+			synchronized(Downloader.this) {
+				downloading--;
+				processed++;
+				notify();
+			}
+		}
+	}
+	
+	protected Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) throws RemoteException { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;
@@ -97,5 +128,9 @@ public class Downloader implements Remote {
 		if(fragmentFailure != -1)
 			return null;
 		return new Resource(resourceName, resourceParts, (ResourceFragment[])fragments.toArray());
+	}
+	
+	public void receive(ResourceFragment fragment, Client client) throws RemoteException {
+		new Receiver(fragment, client);
 	}
 }

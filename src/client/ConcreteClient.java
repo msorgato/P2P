@@ -65,7 +65,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 				} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
 					return;
 				}
-				// chiama il metodo di downloader con resources.get(resourceIndex).getFragment(fragment);	
+				// chiama il metodo remoto di downloader con resources.get(resourceIndex).getFragment(fragment); e l'outherThis
 			}	
 		}
 	}
@@ -120,6 +120,11 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 				res = res + ":" + resources.get(i).getName() + " " + resources.get(i).getParts(); //splittare la stringa usando il carattere ":" come guardia
 			return res;
 		}
+	}
+	
+	@Override
+	public void ping() throws RemoteException {
+		return;
 	}
 
 	@Override

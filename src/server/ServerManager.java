@@ -41,7 +41,7 @@ public class ServerManager {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (AlreadyBoundedException e) {
-			System.out.println("Lancia una bellissima AlreadyBoundedException");
+			System.out.println("Lancia una bellissima AlreadyBoundedException, fuck yea");
 			e.printStackTrace();
 		}
 		try {

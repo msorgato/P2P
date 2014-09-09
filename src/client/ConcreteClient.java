@@ -136,6 +136,32 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	}
 	
 	@Override
+	public boolean connect() {
+		if(!connected) {
+			try {
+				server.connect(this);
+			} catch(RemoteException e) {
+				//il server è down
+				return false;
+			}
+			connected = true;
+		}
+		return connected;
+	}
+	
+	@Override
+	public void disconnect() {
+		if(connected) {
+			try {
+				server.disconnect(this);
+			} catch(RemoteException e) {
+				//Server is already down
+			}
+			connected = false;
+		}
+	}
+	
+	@Override
 	protected void finalize() throws Throwable {
 		try {
 			if(connected)

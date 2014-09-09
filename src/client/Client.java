@@ -13,4 +13,8 @@ public interface Client extends Remote {
 	//questo metodo manda una parte di risorsa, non una risorsa intera!
 	
 	public boolean download(String nm, int prts) throws RemoteException;
+	
+	public boolean connect();
+	
+	public void disconnect();
 }

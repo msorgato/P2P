@@ -25,12 +25,14 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			synchronized(resources) {
 				for(int i = 0; i < resArray.length; i++) 
 					resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
+				for(int i = 0; i < resArray.length; i++)
+					System.out.println(resources.get(i));
 			}
 		}	
 		
 		private boolean addClientResource(String name, int parts) {
 			synchronized(resources) {
-				if(this.isResHere(name, parts))		//nel caso in cui il client abbia già la risorsa
+				if(this.isResHere(name, parts))		//nel caso in cui il client abbia gia' la risorsa
 					return false;
 				resources.add(name + " " + parts);
 			}

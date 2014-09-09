@@ -14,7 +14,7 @@ public interface Client extends Remote {
 	
 	public boolean download(String nm, int prts) throws RemoteException;
 	
-	public boolean connect();
+	public boolean connectToServer() throws RemoteException;
 	
-	public void disconnect();
+	public void disconnectFromServer() throws RemoteException;
 }

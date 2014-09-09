@@ -15,7 +15,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private int maxDownloads;
 	private ArrayList<Resource> resources;		
 	private Report report = new Report();
-	private Server server;
+	private Server server = null;
 	private boolean connected = false;
 	private static final String HOST = "localhost";
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
@@ -49,11 +49,11 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		}
 		catch(MalformedURLException exc) {
 			exc.printStackTrace();
-			System.out.println("Client " + name + " pribabilmente non trova il server " + sName + " perché l'indirizzo è sbagliato");
+			System.out.println("Client " + name + " probabilmente non trova il server " + sName + " perche' l'indirizzo e' sbagliato");
 		}
 		catch(Exception exc) {
 			System.out.println("Connessione non avvenuta. Uscita dal programma.");
-			return;
+			return;	//questo return e' sbagliato
 		}
 		try {
 			connected = server.connect(this);
@@ -136,7 +136,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	}
 	
 	@Override
-	public boolean connect() {
+	public boolean connectToServer() throws RemoteException {
 		if(!connected) {
 			try {
 				server.connect(this);
@@ -150,7 +150,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	}
 	
 	@Override
-	public void disconnect() {
+	public void disconnectFromServer() throws RemoteException {
 		if(connected) {
 			try {
 				server.disconnect(this);

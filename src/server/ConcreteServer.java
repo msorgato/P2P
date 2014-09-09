@@ -181,6 +181,11 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			if(servers.contains(s))
 				return false;
 			servers.add(s);
+			try {
+				System.out.println("Server " + s.getName() + " connesso al Server " + this.name);
+			} catch(RemoteException e) {
+				
+			}
 		}
 		return true;
 	}
@@ -199,6 +204,28 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	}
 	//funzione chiamata da un client connesso al server per richiedere la disconnessione e la seguente cancellazione 
 	//del registro a lui legato
+	
+	@Override
+	public boolean disconnectServer(Server s) throws RemoteException {
+		synchronized(servers) {
+			if(servers.contains(s)) {
+				servers.remove(s);
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		for(int i = 0; i < servers.size(); i++) {
+			try {
+				servers.get(i).disconnectServer(this);
+			} catch(RemoteException e) {
+				continue;
+			}
+		}
+	}
 
 }
 

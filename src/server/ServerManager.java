@@ -7,7 +7,7 @@ public class ServerManager {
 	
 	public static void main(String[] args) {
 		//System.out.println("Current working directory: " + System.getProperty("user.dir"));
-		Server razor, razor2;
+		Server razor, razor2, razor3;
 		try {
 			razor = new ConcreteServer("Razorback");
 		} catch(RemoteException e) {

@@ -87,7 +87,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		try {
 			Thread.sleep(SLEEPTIME);
 		} catch(InterruptedException e) {
-			//lo sleep si è interrotto
+			//lo sleep si è interrotto: che faccio, proseguo e ciccia?
 		}
 		int resourceIndex = -1;		
 		synchronized(resources) {	
@@ -99,12 +99,12 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 				return null;
 			try {
 				report.addReport(c.getName(), nm, Integer.toString(prts), Integer.toString(frgm));
-			} catch(RemoteException e) {
-				
+			} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
+				return null;
 			}
 			return resources.get(resourceIndex).getFragment(frgm);	
 		}	
-	}	//in questo metodo ci va anche l'update del Report alla fine dell'invio della parte della Risorsa.
+	}	
 
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{

@@ -80,7 +80,6 @@ public class Downloader {
 					e.printStackTrace();
 				}
 		}
-		
 		//QUI sono finiti tutti i download. chiamo Resource.check() per vedere se è tutto ok.
 		//metto il check in un ciclo, che esce solo quando check ritorna -1 oppure se non ci sono più client da cui scaricare.
 		int fragmentFailure = Resource.check((ResourceFragment[])fragments.toArray(), resourceName, resourceParts);

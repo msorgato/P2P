@@ -1,9 +1,10 @@
 package client;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class Downloader {
+public class Downloader implements Remote {
 	private	String resourceName;
 	private int resourceParts;
 	private int maxDownloads;
@@ -16,7 +17,6 @@ public class Downloader {
 	private class DownloadFragment extends Thread {
 		private Client target;
 		private int fragment;
-		private ResourceFragment fragToDownload = null;
 
 		private DownloadFragment(int fragment, Client target) { 
 			this.target = target;
@@ -47,7 +47,7 @@ public class Downloader {
 		} 
 	}
 	
-	public Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) { 
+	public Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) throws RemoteException { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;

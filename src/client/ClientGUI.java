@@ -65,12 +65,14 @@ public class ClientGUI {
 		resourcesArea = new JTextArea();
 		JScrollPane resourcesAreaList = new JScrollPane(resourcesArea);
 		resourcesAreaList.setBorder(BorderFactory.createTitledBorder("File completi - logs download"));
-		resourcesAreatatusP.add(resourcesAreaList);		
+		resourcesAreatatusP.add(resourcesAreaList);	
+		resourcesArea.setEditable(false);		//le aree di testo non sono modificabili
 		
 		downloadQueue = new JTextArea();
 		JScrollPane downloadQueueList = new JScrollPane(downloadQueue);
 		downloadQueueList.setBorder(BorderFactory.createTitledBorder("Coda download"));
 		resourcesAreatatusP.add(downloadQueueList);
+		downloadQueue.setEditable(false);		//le aree di testo non sono modificabili
 		
 		//preparo il logs sottostante
 		logs = new JTextArea();
@@ -80,21 +82,17 @@ public class ClientGUI {
 		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
 		logList.setBorder(BorderFactory.createTitledBorder("logs"));
 		//logs.setForeground(Color.RED);
-		logList.setPreferredSize(new Dimension(470, 180));
+		logList.setPreferredSize(new Dimension(500, 200));
+		logs.setEditable(false);				//le aree di testo non sono modificabili
 				
 		//aggiungo i vari pannelli al JFrame principale
 		frame.add(sensiblePanel,BorderLayout.NORTH);
 		frame.add(resourcesAreatatusP,BorderLayout.CENTER);
-		frame.add(logList,BorderLayout.SOUTH);		
-		
-		//non permetto di editare il testo
-		resourcesArea.setEditable(false);
-		downloadQueue.setEditable(false);
-		logs.setEditable(false);
+		frame.add(logList,BorderLayout.SOUTH);				
 				
-		//impostazioni generali della finestra
-		frame.setSize(470, 400);
-		frame.setMinimumSize(new Dimension(470,400));
+		//gestisco le impostazioni della finestra
+		frame.setSize(500, 400);
+		frame.setMinimumSize(new Dimension(500,400));
 		frame.setVisible(true);
 		frame.setResizable(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

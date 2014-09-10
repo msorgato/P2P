@@ -133,5 +133,7 @@ public class ClientGUI {
 				resourcesArea.append(resources.get(i));
 			}
 		}
-	}	
+	}
+	
+	
 }

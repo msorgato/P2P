@@ -77,11 +77,12 @@ public class ServerGUI {
 			clientsConnected.add(name);
 			refreshClients();
 		}
+		addLog("Client " + name + " connesso");
 	}
 	
 	public void removeClient(String name) {
+		boolean found = false;
 		synchronized(clientsConnected) {
-			boolean found = false;
 			for(int i = 0; i < clientsConnected.size() && !found; i++) {
 				if(clientsConnected.get(i).equals(name)) {
 					clientsConnected.remove(i);
@@ -90,6 +91,8 @@ public class ServerGUI {
 				}
 			}	
 		}
+		if(found)
+			addLog("Client " + name + " disconnesso");
 	}
 	
 	private void refreshClients() {
@@ -108,11 +111,12 @@ public class ServerGUI {
 			serversConnected.add(name);
 			refreshServers();
 		}
+		addLog("Server " + name + " connesso");
 	}
 	
 	public void removeServer(String name) {
+		boolean found = false;
 		synchronized(serversConnected) {
-			boolean found = false;
 			for(int i = 0; i < serversConnected.size() && !found; i++) {
 				if(serversConnected.get(i).equals(name)) {
 					serversConnected.remove(i);
@@ -121,6 +125,8 @@ public class ServerGUI {
 				}
 			}
 		}
+		if(found)
+			addLog("Server " + name + " disconnesso");
 	}
 	
 	private void refreshServers() {

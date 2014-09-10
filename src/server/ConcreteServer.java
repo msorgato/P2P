@@ -25,8 +25,6 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		private ClientRegistry(Client c, String res) { 
 			client = c;
 			String[] resArray = res.split(":");
-			System.out.println(resArray[0]);
-			System.out.println(res);
 			synchronized(resources) {
 				for(int i = 0; i < resArray.length; i++) 
 					resources.add(resArray[i]);		//DOVREBBE funzionare. testalo.
@@ -40,10 +38,8 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				resources.add(name + " " + parts);
 			}
 			try {
-				gui.addLog("Server dice: Il Client " + client.getName() + " ha ottenuto la risorsa "+ name + " " + parts); //----------------------------
-				System.out.println(resources.get(2));
+				gui.addLog("Il Client " + client.getName() + " ha ottenuto la risorsa "+ name + " " + parts); //----------------------------
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return true;	
@@ -85,7 +81,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			e.printStackTrace();
 		}
 		catch(MalformedURLException exc) {
-			System.out.println("L'invocazione del metdo rebind lancia una MalformedURLException");
+			System.out.println("L'invocazione del metodo rebind lancia una MalformedURLException");
 			exc.printStackTrace();
 		}
 		catch(Exception ex) {
@@ -164,7 +160,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				if(c.equals(registry.get(i).client)) {
 					boolean ok = registry.get(i).addClientResource(name, parts);
 					if(!ok)
-						System.out.println("Il client " + c.getName() + " possedeva già la risorsa " + name + " " + parts);		//mah, da guardare.
+						gui.addLog("Il client " + c.getName() + " possedeva già la risorsa " + name + " " + parts);		//mah, da guardare.
 					return;
 				}
 			}
@@ -173,67 +169,80 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 
 	@Override
 	public boolean connect(Client c) throws RemoteException {
-		/*	Dubbio: metto un controllo per vedere se due clients con lo 
-		*	stesso nome non possano connettersi a questo o ad altri
-		*	server?
-		*/
-		String res;
+		String res, clientName = "sconosciuto";
 		try {
 			res = c.getResources();
+			clientName = c.getName();
 		} catch(RemoteException e) {
-			//Il Client non è raggiungibile
 			return false;
 		}
-		System.out.println(res);
 		synchronized(registry) {
 			registry.add(new ClientRegistry(c, res));	//se arriva ad eseguire questa istruzione, res è stato ottenuto correttamente
 			try {
-				gui.addLog("Client " + c.getName() + " connesso.");
+				gui.addClient(c.getName());
 			} catch(RemoteException ex) {	//Problemi di connessione remota
 				registry.remove(registry.size());
+				gui.removeClient(clientName);
 				return false;
 			}
 		}
-		System.out.println(res);
 		return true;	//ha inserito correttamente il registro del Client e non sono apparsi errori di connessione
 	}
 	
 	@Override
 	public boolean connectServer(Server s) throws RemoteException {
+		String sName;
+		try {
+			sName = s.getName();
+		} catch(RemoteException e ) {
+			return false;
+		}
 		synchronized(servers) {
 			if(servers.contains(s))
 				return false;
 			servers.add(s);
 			try {
-				System.out.println("Server " + s.getName() + " connesso al Server " + this.name);
+				gui.addServer(s.getName());
 			} catch(RemoteException e) {
-				//Gestisci l'eccezione
 				e.printStackTrace();
+				gui.removeServer(sName);
+				servers.remove(servers.size());
+				return false;
 			}
 		}
 		return true;
 	}
 
+	//funzione chiamata da un client connesso al server per richiedere la disconnessione e la seguente cancellazione 
+	//del registro a lui legato
 	@Override
 	public boolean disconnect(Client c) {
+		String cName = "sconosciuto";
+		try {
+			cName = c.getName();
+		} catch(RemoteException e) {}
 		synchronized(registry) {
 			for(int i = 0; i < registry.size(); i++) {
 				if(registry.get(i).client == c) {
 					registry.remove(i);
+					gui.removeClient(cName);
 					return true;
 				}
 			}
 			return false;
 		}
 	}
-	//funzione chiamata da un client connesso al server per richiedere la disconnessione e la seguente cancellazione 
-	//del registro a lui legato
 	
 	@Override
 	public boolean disconnectServer(Server s) throws RemoteException {
+		String sName = "sconosciuto";
+		try {
+			sName = s.getName();
+		} catch(RemoteException e) {}
 		synchronized(servers) {
 			if(servers.contains(s)) {
 				servers.remove(s);
+				gui.removeServer(sName);
 				return true;
 			}
 			return false;

@@ -30,46 +30,6 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		}
 	}
 	
-	private class Uploader extends Thread {
-		private String resName;
-		private int resParts;
-		private int fragment;
-		private Downloader downloader = null;
-		private Client client = null;
-		
-		private Uploader(String resName, int resParts, int fragment, Downloader downloader, Client client) {
-			this.resName = resName;
-			this.resParts = resParts;
-			this.fragment = fragment;
-			this.downloader = downloader;
-			this.client = client;
-			start();
-		}
-		
-		public void run() {
-			try {
-				Thread.sleep(SLEEPTIME);
-			} catch(InterruptedException e) {
-				//lo sleep si è interrotto: che faccio, proseguo e ciccia?
-			}
-			int resourceIndex = -1;		
-			synchronized(resources) {	
-				for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
-					if(resources.get(i).equalsResource(resName, resParts))	
-						resourceIndex = i;
-				}
-				if(resourceIndex == -1)
-					//chiama il metodo di downloader con fragToSend nullo
-				try {
-					report.addReport(client.getName(), resName, Integer.toString(resParts), Integer.toString(fragment));
-				} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
-					return;
-				}
-				// chiama il metodo remoto di downloader con resources.get(resourceIndex).getFragment(fragment); e l'outherThis
-			}	
-		}
-	}
-	
 	protected ConcreteClient(String cName, int maxD, ArrayList<Resource> res, String sName) throws RemoteException {	
 		name = cName;
 		maxDownloads = maxD;
@@ -121,15 +81,29 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			return res;
 		}
 	}
-	
-	@Override
-	public void ping() throws RemoteException {
-		return;
-	}
 
 	@Override
-	public void requestFragment(String nm, int prts, int frgm, Downloader d, Client c) throws RemoteException {
-		new Uploader(nm, prts, frgm, d, c);			
+	public ResourceFragment sendResourceFragment(String nm, int prts, int frgm, Client c) throws RemoteException {
+		try {
+			Thread.sleep(SLEEPTIME);
+		} catch(InterruptedException e) {
+			//lo sleep si è interrotto: che faccio, proseguo e ciccia?
+		}
+		int resourceIndex = -1;		
+		synchronized(resources) {	
+			for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
+				if(resources.get(i).equalsResource(nm, prts))	
+					resourceIndex = i;
+			}
+			if(resourceIndex == -1)
+				return null;
+			try {
+				report.addReport(c.getName(), nm, Integer.toString(prts), Integer.toString(frgm));
+			} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
+				return null;
+			}
+			return resources.get(resourceIndex).getFragment(frgm);	
+		}	
 	}	
 
 	@Override

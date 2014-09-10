@@ -88,6 +88,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			ex.printStackTrace();
 		}
 		System.out.println("Server " + name + " pubblicizzato");
+		gui = new ServerGUI();
 		if(!(serverNames == null)) {
 			for(int i = 0; i < serverNames.length; i++) {
 				Server srvr = null;
@@ -103,19 +104,27 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 					e.printStackTrace();
 					//GESTISCI
 				}
+				String sName;
+				try {
+					sName = srvr.getName();
+				} catch(RemoteException exc) {
+					continue;
+				}
 				if(srvr != null) {
 					synchronized(servers) {
 						try {
-							if(srvr.connectServer(this))
+							if(srvr.connectServer(this)) {
 								servers.add(srvr);
+								gui.addServer(srvr.getName());
+							}
 						} catch(RemoteException e) {
 							e.printStackTrace();
+							gui.removeServer(sName);
 						}
 					}
 				}
 			}
 		}
-		gui = new ServerGUI();
 	}
 	
 	@Override

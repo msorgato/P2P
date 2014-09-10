@@ -31,7 +31,6 @@ public class ServerManager {
 			} catch(InterruptedException ex) {}
 			System.exit(0);				
 		}	
-		
 		ServerManager manager = new ServerManager(args[0]);
 	}
 

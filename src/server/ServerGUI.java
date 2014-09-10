@@ -36,7 +36,7 @@ public class ServerGUI {
 		//inizializzazione delle varie aree di testo
 		clients = new JTextArea();
 		JScrollPane clientsArea = new JScrollPane(clients);
-		clientsArea.setBorder(BorderFactory.createTitledBorder("Client connessi - risorse"));
+		clientsArea.setBorder(BorderFactory.createTitledBorder("Client connessi"));
 		mainPanel.add(clientsArea);	
 		clients.setEditable(false);		//le aree di testo non sono modificabili
 		
@@ -100,8 +100,8 @@ public class ServerGUI {
 		synchronized(clientsConnected) {
 			if(clientsConnected.size() != 0)
 				clients.append(clientsConnected.get(0));
-			for(int i = 0; i < clientsConnected.size(); i++) {
-				clients.append(clientsConnected.get(i));
+			for(int i = 1; i < clientsConnected.size(); i++) {
+				clients.append("\n" + clientsConnected.get(i));
 			}
 		}
 	}
@@ -134,8 +134,8 @@ public class ServerGUI {
 		synchronized(serversConnected) {
 			if(serversConnected.size() != 0)
 				servers.append(serversConnected.get(0));
-			for(int i = 0; i < serversConnected.size(); i++) {
-				clients.append(serversConnected.get(i));
+			for(int i = 1; i < serversConnected.size(); i++) {
+				clients.append("\n" + serversConnected.get(i));
 			}
 		}
 	}	

@@ -239,7 +239,6 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			}
 		}
 	}
-
 }
 
 /*

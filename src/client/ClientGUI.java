@@ -151,8 +151,6 @@ public class ClientGUI {
 		logs = new JTextArea();
 		logs.setFont(new Font("Arial", Font.PLAIN, 12));
 		JScrollPane logPanel = new JScrollPane(logs);
-		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //la visualizzazione di nuovi log causa scrolling automatico
-		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
 		logPanel.setBorder(BorderFactory.createTitledBorder("logs"));
 		logPanel.setPreferredSize(new Dimension(500, 200));
 		logs.setEditable(false);				//le aree di testo non sono modificabili
@@ -171,8 +169,8 @@ public class ClientGUI {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 	
-	public synchronized void addLog(String log) {
-		logs.append("\n" + log);
+	public void addLog(String log) {
+		logs.insert("\n" + log, logs.getDocument().getLength());
 	}
 	
 	public void addResource(String name) {

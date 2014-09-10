@@ -49,8 +49,6 @@ public class ServerGUI {
 		logs = new JTextArea();
 		logs.setFont(new Font("Arial", Font.PLAIN, 12));
 		JScrollPane logArea = new JScrollPane(logs);
-		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //la visualizzazione di nuovi log causa scrolling automatico
-		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
 		logArea.setBorder(BorderFactory.createTitledBorder("Log"));
 		logArea.setPreferredSize(new Dimension(430, 180));
 		logs.setEditable(false);		//le aree di testo non sono modificabili

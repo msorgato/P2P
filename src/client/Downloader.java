@@ -40,8 +40,8 @@ public class Downloader {
 				System.out.println("Notifico il Downloader");
 			}
 			synchronized(fragments) {
-				if(!(fragToDownload == null))
-					fragments.add(fragment - 1, fragToDownload);
+				if(fragToDownload != null)
+					fragments.add((fragment - 1), fragToDownload);
 				processed++;
 				fragments.notify();
 			}
@@ -68,6 +68,7 @@ public class Downloader {
 						System.out.println("Downloader svegliato");
 					} catch(InterruptedException e) {
 						//Thread arrestato mentre aspettava di lanciare altri download
+						return null;
 					}
 				}
 				downloading++;

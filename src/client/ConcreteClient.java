@@ -105,7 +105,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
 				return null;
 			}
-			System.out.println("FooClient2 ha terminato di inviare la parte " + frgm + "della risorsa");
+			System.out.println(name + " ha terminato di inviare la parte " + frgm + "della risorsa");
 			return resources.get(resourceIndex).getFragment(frgm);	
 		}	
 	}	

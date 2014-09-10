@@ -64,4 +64,8 @@ public class ServerGUI {
 		frame.setResizable(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
+	
+	//Mancano i bellissimi metodi di aggiornamento delle varie listine. pucciosi, loro.
+	
+	
 }

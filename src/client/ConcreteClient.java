@@ -20,7 +20,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	private static final String HOST = "localhost";
 	private static final int SLEEPTIME = 2000;	//tempo di attesa nell'invio di un frammento di risorsa
 	
-	private ClientGUI gui;
+	private ClientGUI gui = new ClientGUI();
 		
 	private class Report {
 		ArrayList<String> report = new ArrayList<String>();

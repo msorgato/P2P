@@ -16,7 +16,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	private ArrayList<Server> servers = new ArrayList<Server>();
 	private static final String HOST = "localhost";
 	
-	private ServerGUI gui;
+	private ServerGUI gui = new ServerGUI();
 	
 	private class ClientRegistry {
 		private Client client;

@@ -36,6 +36,13 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 					return false;
 				resources.add(name + " " + parts);
 			}
+			try {
+				System.out.println("Server dice: Il Client " + client.getName() + " ha ottenuto la risorsa "+ name + " " + parts);
+				System.out.println(resources.get(2));
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;	
 		}
 		//funzione utilizzata dal Server per aggiungere una risorsa in caso di scaricamento
@@ -148,9 +155,10 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 
 	@Override
 	public void addResource(Client c, String name, int parts) throws RemoteException {
+		System.out.println("Metodo addResource invocato correttamente");
 		synchronized(registry) {
 			for(int i = 0; i < registry.size(); i++) {
-				if(c == registry.get(i).client) {		//se vuoi, raffina i controlli per vedere se quella risorsa non c'era già
+				if(c.equals(registry.get(i).client)) {
 					boolean ok = registry.get(i).addClientResource(name, parts);
 					if(!ok)
 						System.out.println("Il client " + c.getName() + " possedeva già la risorsa " + name + " " + parts);		//mah, da guardare.

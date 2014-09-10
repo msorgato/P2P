@@ -18,13 +18,31 @@ public class ClientManager {
 		for(int i = 0; i < 7; i++) {
 			frags2[i] = new ResourceFragment("due", 7, i + 1);
 		}
-		Resource resource = new Resource("uno", 5, frags), resource2 = new Resource("due", 7, frags2);	
-		ArrayList<Resource> resources = new ArrayList<Resource>();
+		ResourceFragment[] frags3 = new ResourceFragment[5], frags4 = new ResourceFragment[7];
+		for(int i = 0; i < 5; i++) {
+			frags3[i] = new ResourceFragment("tre", 5, i + 1);
+		}
+		for(int i = 0; i < 7; i++) {
+			frags4[i] = new ResourceFragment("quattro", 7, i + 1);
+		}
+		Resource resource = new Resource("uno", 5, frags), resource2 = new Resource("due", 7, frags2), resource3 = new Resource("tre", 5, frags3),
+				resource4 = new Resource("quattro", 7, frags4);	
+		ArrayList<Resource> resources = new ArrayList<Resource>(), resources2 = new ArrayList<Resource>();
 		resources.add(resource);
 		resources.add(resource2);
+		resources2.add(resource3);
+		resources2.add(resource4);
+		Client client1 = null, client2 = null;
 		try {
-			Client client = new ConcreteClient("FooClient", 2, resources, "Razorback");
+			client1 = new ConcreteClient("FooClient1", 2, resources, "Razorback");
+			client2 = new ConcreteClient("FooClient2", 2, resources2, "Razorback");
 		} catch(RemoteException e) {
+			e.printStackTrace();
+		}
+		try {
+			client1.download("tre", 5);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

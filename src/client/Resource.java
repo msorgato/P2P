@@ -1,5 +1,7 @@
 package client;
 
+import java.util.ArrayList;
+
 public class Resource {
 	private String name;
 	private int parts;
@@ -18,14 +20,14 @@ public class Resource {
 		return fragments[index - 1];	//viene ritornato l'elemento index-1 perché la cardinalità dei frammenti è espressa da 1 in poi
 	}
 
-	public static int check(ResourceFragment[] frags, String nm, int prts) {
+	public static int check(ArrayList<ResourceFragment> frags, String nm, int prts) {
 		try {		
-			for(int i = 0; i < prts; i++) {
-				if((frags[i] == null) || !(frags[i].getResourceName().equals(nm)) || !(frags[i].getPart() == (i + 1)))
+			for(int i = 0; i < frags.size(); i++) {
+				if((frags.get(i) == null) || !(frags.get(i).getResourceName().equals(nm)) || !(frags.get(i).getPart() == (i + 1)))
 					//i + 1 perche' le parti delle risorse sono intere >= 1
 					return i;
 			}	
-		} catch(ArrayIndexOutOfBoundsException e) {	//ho meno frammenti di risorsa di quanti me ne servissero
+		} catch(IndexOutOfBoundsException e) {	//ho meno frammenti di risorsa di quanti me ne servissero
 			return -2;			//questo controllo non serve più
 		}
 		return -1;					//system all green
@@ -38,7 +40,7 @@ public class Resource {
 	
 	
 	public boolean equalsResource(String name, int parts) {
-		return name == this.name && parts == this.parts;
+		return name.equals(this.name) && parts == this.parts;
 	}
 	/*
 	*	metodo equals adattato ad una risorsa.

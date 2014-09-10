@@ -24,6 +24,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		ArrayList<String> report = new ArrayList<String>();
 		private synchronized void addReport(String Client, String resName, String resParts, String resPart) {
 			report.add(Client + " " + resName + " " + resParts + " " + resPart);
+			System.out.println("FooClient2 ha inviato la parte "+ resPart + " della risorsa" + resName);
 		}
 		private synchronized ArrayList<String> getReport() {
 			return report;
@@ -89,12 +90,14 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		} catch(InterruptedException e) {
 			//lo sleep si è interrotto: che faccio, proseguo e ciccia?
 		}
+		System.out.println("Client " + name + " dice che client " + c.getName() + " sta scaricando la risorsa "+ nm + " di " + prts + "parti"); //---------------------------------
 		int resourceIndex = -1;		
 		synchronized(resources) {	
 			for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
 				if(resources.get(i).equalsResource(nm, prts))	
 					resourceIndex = i;
 			}
+			System.out.println("resourceIndex: " + resourceIndex);
 			if(resourceIndex == -1)
 				return null;
 			try {
@@ -102,6 +105,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
 				return null;
 			}
+			System.out.println("FooClient2 ha terminato di inviare la parte " + frgm + "della risorsa");
 			return resources.get(resourceIndex).getFragment(frgm);	
 		}	
 	}	
@@ -130,6 +134,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			} catch(RemoteException e) {
 				connected = false;
 			}
+			System.out.println("Scaricata la risorsa " + resToAdd.getName() + " " + resToAdd.getParts());
 			return true;
 		}
 		return false;

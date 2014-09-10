@@ -36,13 +36,14 @@ public class Downloader {
 					clients.add(target);
 				}
 				downloading--;
-				notify();
+				Downloader.this.notify();
+				System.out.println("Notifico il Downloader");
 			}
 			synchronized(fragments) {
 				if(!(fragToDownload == null))
 					fragments.add(fragment - 1, fragToDownload);
 				processed++;
-				notify();
+				fragments.notify();
 			}
 		} 
 	}
@@ -63,7 +64,8 @@ public class Downloader {
 					if(downloading == 0 && clients.isEmpty())
 						return null;	//se non c'è nessun thread che sta scaricando e ho finito i client, non posso scaricare la risorsa
 					try {
-						wait();
+						this.wait();
+						System.out.println("Downloader svegliato");
 					} catch(InterruptedException e) {
 						//Thread arrestato mentre aspettava di lanciare altri download
 					}
@@ -75,14 +77,15 @@ public class Downloader {
 		synchronized(fragments) {
 			while(processed < resourceParts)
 				try {
-					wait();	//aspetto che tutti i download iniziali finiscano
+					fragments.wait();	//aspetto che tutti i download iniziali finiscano
 				} catch(InterruptedException e) {
 					e.printStackTrace();
 				}
 		}
 		//QUI sono finiti tutti i download. chiamo Resource.check() per vedere se è tutto ok.
 		//metto il check in un ciclo, che esce solo quando check ritorna -1 oppure se non ci sono più client da cui scaricare.
-		int fragmentFailure = Resource.check((ResourceFragment[])fragments.toArray(), resourceName, resourceParts);
+		
+		int fragmentFailure = Resource.check(fragments, resourceName, resourceParts);
 		while(fragmentFailure != -1 && !(clients.isEmpty())) {
 			synchronized(fragments) {
 				new DownloadFragment(fragmentFailure, clients.remove(0));
@@ -91,11 +94,13 @@ public class Downloader {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				fragmentFailure = Resource.check((ResourceFragment[])fragments.toArray(), resourceName, resourceParts);
+				fragmentFailure = Resource.check(fragments, resourceName, resourceParts);
 			}
 		}
 		if(fragmentFailure != -1)
 			return null;
-		return new Resource(resourceName, resourceParts, (ResourceFragment[])fragments.toArray());
+		ResourceFragment[] frags = new ResourceFragment[fragments.size()];
+		frags = fragments.toArray(frags);
+		return new Resource(resourceName, resourceParts, frags);
 	}
 }

@@ -1,12 +1,32 @@
 package server;
 
-import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 
 public class ServerManager {
 	
+	public ServerManager(String serverName) {
+		try {
+			Server server = new ConcreteServer(serverName);
+		} catch (RemoteException e) {
+			System.out.println("Sono occorsi problemi nella creazione del Server.\n"
+					+ "Verificare che il comando rmiregistry sia stato avviato correttamente.");
+			e.printStackTrace();
+		} catch (AlreadyBoundedException e) {
+			System.out.println("Il Server di nome " + serverName + " risulta gia' presente. La pubblicazione di uno stesso\n"
+					+ "Server non e' consentita.");
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
+		if(args.length == 0 || args[0] == "--help") {
+			System.out.println("\nIl comando di avvio necessita di un argomento String valido\n"
+					+ "da assegnare come nome del Server.");
+			System.exit(0);				
+		}	
+		
+		ServerManager manager = new ServerManager(args[0]);
+		/*
 		//System.out.println("Current working directory: " + System.getProperty("user.dir"));
 		Server razor;
 		try {
@@ -17,7 +37,7 @@ public class ServerManager {
 		} catch (AlreadyBoundedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Finito il main del Server");
+		System.out.println("Finito il main del Server");*/
 	}
 
 }

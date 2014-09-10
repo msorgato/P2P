@@ -13,6 +13,8 @@ public class Downloader {
 	private ArrayList<Client> clients;		
 	private ArrayList<ResourceFragment> fragments;
 	
+	private ClientGUI gui;
+	
 	private class DownloadFragment extends Thread {
 		private Client target;
 		private int fragment;
@@ -26,6 +28,7 @@ public class Downloader {
 		
 		public void run() {
 			try {
+				gui.addLog("Scarico " + resourceName + " parte " + fragment + " da "  + target.getName());
 				fragToDownload = target.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
 			} catch(RemoteException e) {
 				target = null;
@@ -40,20 +43,23 @@ public class Downloader {
 				System.out.println("Notifico il Downloader");
 			}
 			synchronized(fragments) {
-				if(fragToDownload != null)
+				if(fragToDownload != null) {
 					fragments.add((fragment - 1), fragToDownload);
+					gui.addLog("Scaricata parte " + fragment + " di " + resourceName);
+				}
 				processed++;
 				fragments.notify();
 			}
 		} 
 	}
 	
-	protected Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown) { 
+	protected Downloader(String nm, int prts, ArrayList<Client> cls, Client clientDownloading, int maxDown, ClientGUI gui) { 
 		resourceName = nm; 
 		resourceParts = prts; 
 		maxDownloads = maxDown;
 		clients = cls; 
 		this.clientDownloading = clientDownloading;
+		this.gui = gui;
 		fragments = new ArrayList<ResourceFragment>(prts);
 	} 
 	

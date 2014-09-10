@@ -26,7 +26,6 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		ArrayList<String> report = new ArrayList<String>();
 		private synchronized void addReport(String Client, String resName, String resParts, String resPart) {
 			report.add(Client + " " + resName + " " + resParts + " " + resPart);
-			System.out.println("FooClient2 ha inviato la parte "+ resPart + " della risorsa" + resName);
 		}
 		private synchronized ArrayList<String> getReport() {
 			return report;
@@ -123,7 +122,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 				connected = false;
 				return false;
 			}
-			Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads);
+			Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads, gui);
 			Resource resToAdd = downloader.process();
 			if(resToAdd == null) {
 				//QUI abbiamo un bel problema: non siamo riusciti a scaricare la risorsa che ci serviva

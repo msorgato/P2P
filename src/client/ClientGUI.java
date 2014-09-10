@@ -18,7 +18,6 @@ import javax.swing.WindowConstants;
 import javax.swing.text.DefaultCaret;
 
 public class ClientGUI {
-	//componenti grafici
 	private JFrame frame;					//frame principale
 	private JTextArea resourcesArea;		//lista di risorse del client
 	private JTextArea downloadQueue;		//coda di download

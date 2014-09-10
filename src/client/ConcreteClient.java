@@ -42,8 +42,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		} catch(RemoteException ex) {
 			ex.printStackTrace();
 			System.out.println("Sono stati riscontrati dei problemi nel raggiungimento del server " + sName);
-			//probabilmente il server non è stato pubblicato
-			//oppure RMI non è stato lanciato
+			//probabilmente il server non e' stato pubblicato
+			//oppure RMI non e' stato lanciato
 		} 
 		catch(NotBoundException e) {
 			e.printStackTrace();
@@ -90,7 +90,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		try {
 			Thread.sleep(SLEEPTIME);
 		} catch(InterruptedException e) {
-			//lo sleep si è interrotto: che faccio, proseguo e ciccia?
+			return null;
 		}
 		System.out.println("Client " + name + " dice che client " + c.getName() + " sta scaricando la risorsa "+ nm + " di " + prts + "parti"); //---------------------------------
 		int resourceIndex = -1;		
@@ -104,7 +104,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 				return null;
 			try {
 				report.addReport(c.getName(), nm, Integer.toString(prts), Integer.toString(frgm));
-			} catch(RemoteException e) {	//il client target è morto mentre aspettava il frammento
+			} catch(RemoteException e) {	//il client target e' morto mentre aspettava il frammento
 				return null;
 			}
 			System.out.println(name + " ha terminato di inviare la parte " + frgm + "della risorsa");
@@ -148,7 +148,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			try {
 				server.connect(this);
 			} catch(RemoteException e) {
-				//il server è down
+				//il server e' offline
 				return false;
 			}
 			connected = true;

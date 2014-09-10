@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,6 +26,8 @@ public class ClientGUI {
 	private JTextField searchArea;			//barra testuale di ricerca risorse
 	private JButton disconnectButton;		//pulsante di disconnessione
 	private JButton searchButton;			//pulsante di ricerca
+	
+	private ArrayList<String> resources = new ArrayList<String>();
 	
 	public ClientGUI() {
 		//layout della GUI
@@ -50,7 +53,7 @@ public class ClientGUI {
 		//creo il pulsante Disconnetti
 		disconnectButton = new JButton("Disconnetti");
 		disconnectButton.setPreferredSize(new Dimension(disconnectButton.getPreferredSize().width,  
-													searchPanel.getPreferredSize().height-9)); 
+													searchPanel.getPreferredSize().height - 9)); 
 		disconnectButton.setEnabled(false);
 		
 		//aggiungo barra di ricerca e pulsante disconnetti al pannello sensiblePanel
@@ -75,13 +78,14 @@ public class ClientGUI {
 		downloadQueue.setEditable(false);		//le aree di testo non sono modificabili
 		
 		logs = new JTextArea();
-		logs.setFont(new Font("Arial", Font.PLAIN, 10));
+		logs.setFont(new Font("Arial", Font.PLAIN, 12));
 		JScrollPane logPanel = new JScrollPane(logs);
 		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //la visualizzazione di nuovi log causa scrolling automatico
 		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
 		logPanel.setBorder(BorderFactory.createTitledBorder("logs"));
 		logPanel.setPreferredSize(new Dimension(500, 200));
 		logs.setEditable(false);				//le aree di testo non sono modificabili
+		logs.setText("In attesa di operazioni...");
 				
 		//aggiungo i vari pannelli al JFrame principale
 		frame.add(sensiblePanel,BorderLayout.NORTH);
@@ -96,5 +100,38 @@ public class ClientGUI {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 	
+	public void addLog(String log) {
+		logs.append("\n" + log);
+	}
 	
+	public void addResource(String name) {
+		synchronized(resources) {
+			resources.add(name);
+			refreshResources();
+		}
+	}
+	
+	public void removeResource(String name) {
+		synchronized(resources) {
+			boolean found = false;
+			for(int i = 0; i < resources.size() && !found; i++) {
+				if(resources.get(i).equals(name)) {
+					resources.remove(i);
+					found = true;
+					refreshResources();
+				}
+			}	
+		}
+	}
+	
+	private void refreshResources() {
+		resourcesArea.setText("");
+		synchronized(resources) {
+			if(resources.size() != 0)
+				resourcesArea.append(resources.get(0));
+			for(int i = 0; i < resources.size(); i++) {
+				resourcesArea.append(resources.get(i));
+			}
+		}
+	}	
 }

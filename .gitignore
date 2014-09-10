@@ -36,5 +36,6 @@ Icon
 .Trashes
 
 # Files ignored in P2P Project
-.class
-.java~
+*.class
+*.java~
+*.bat

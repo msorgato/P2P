@@ -25,23 +25,25 @@ public class Downloader {
 		}
 		
 		public void run() {
-			/*boolean requestSent = false;
-			while(!requestSent) {
-				try {
-					target.requestFragment(resourceName, resourceParts, fragment, Downloader.this, clientDownloading);
-				} catch(RemoteException e) {
-					target = null;
-				}
-				if(target == null)
-					synchronized(clients) {
-						
-					}
-			}
 			try {
-				target.requestFragment(resourceName, resourceParts, fragment, Downloader.this, clientDownloading);
+				fragToDownload = target.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
 			} catch(RemoteException e) {
 				target = null;
-			}*/
+				fragToDownload = null;
+			}
+			synchronized(Downloader.this) {
+				if(!(target == null)) {
+					clients.add(target);
+				}
+				downloading--;
+				notify();
+			}
+			synchronized(fragments) {
+				if(!(fragToDownload == null))
+					fragments.add(fragment - 1, fragToDownload);
+				processed++;
+				notify();
+			}
 		} 
 	}
 	

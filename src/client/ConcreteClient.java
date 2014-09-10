@@ -155,7 +155,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			try {
 				server.disconnect(this);
 			} catch(RemoteException e) {
-				//Server is already down
+				System.out.println("Alla disconnessione del Client " + name + ", anche il Server ha presentato problemi");
 			}
 			connected = false;
 		}
@@ -163,12 +163,7 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		try {
-			if(connected)
-				server.disconnect(this);
-		} catch(RemoteException e) {
-			System.out.println("Alla disconnessione del Client " + name + ", anche il Server ha presentato problemi");
-		}
+		disconnectFromServer();
 	}
 	/*
 	 * Semplice funzione che invoca, quando l'oggetto viene deallocato, un'ulteriore chiusura delle connessioni "soft".

@@ -8,12 +8,15 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 import client.Client;
+import client.ClientGUI;
 
 public class ConcreteServer extends UnicastRemoteObject implements Server {
 	private String name;
 	private ArrayList<ClientRegistry> registry = new ArrayList<ClientRegistry>();
 	private ArrayList<Server> servers = new ArrayList<Server>();
 	private static final String HOST = "localhost";
+	
+	private ServerGUI gui;
 	
 	private class ClientRegistry {
 		private Client client;
@@ -37,7 +40,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				resources.add(name + " " + parts);
 			}
 			try {
-				System.out.println("Server dice: Il Client " + client.getName() + " ha ottenuto la risorsa "+ name + " " + parts);
+				gui.addLog("Server dice: Il Client " + client.getName() + " ha ottenuto la risorsa "+ name + " " + parts); //----------------------------
 				System.out.println(resources.get(2));
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
@@ -185,7 +188,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		synchronized(registry) {
 			registry.add(new ClientRegistry(c, res));	//se arriva ad eseguire questa istruzione, res è stato ottenuto correttamente
 			try {
-				System.out.println("Client " + c.getName() + " connesso.");
+				gui.addLog("Client " + c.getName() + " connesso.");
 			} catch(RemoteException ex) {	//Problemi di connessione remota
 				registry.remove(registry.size());
 				return false;

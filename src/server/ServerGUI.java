@@ -19,7 +19,7 @@ public class ServerGUI {
 	private JTextArea servers; 	//lista server connessi
 	private JTextArea logs;		//log di sistema
 	
-	public ServerGUI() throws Exception {
+	public ServerGUI() {
 		//layout della GUI
 		frame = new JFrame("Server");
 		frame.setLayout(new BorderLayout());
@@ -42,14 +42,12 @@ public class ServerGUI {
 		mainPanel.add(serversArea);
 		servers.setEditable(false);		//le aree di testo non sono modificabili
 		
-		//preparo il log
 		logs = new JTextArea();
 		logs.setFont(new Font("Arial", Font.PLAIN, 10));
 		JScrollPane logArea = new JScrollPane(logs);
-		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //scrolling continuo verso il basso
+		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //la visualizzazione di nuovi log causa scrolling automatico
 		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
 		logArea.setBorder(BorderFactory.createTitledBorder("Log"));
-		//logs.setForeground(Color.RED);
 		logArea.setPreferredSize(new Dimension(430, 180));
 		logs.setEditable(false);		//le aree di testo non sono modificabili
 		
@@ -63,6 +61,10 @@ public class ServerGUI {
 		frame.setVisible(true);
 		frame.setResizable(true);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	}
+	
+	public void addLog(String log) {
+		logs.append(log);
 	}
 	
 	//Mancano i bellissimi metodi di aggiornamento delle varie listine. pucciosi, loro.

@@ -35,60 +35,58 @@ public class ClientGUI {
 		JPanel sensiblePanel = new JPanel();
 		sensiblePanel.setLayout(new FlowLayout());
 				
-		JPanel findP = new JPanel();
-		findP.setLayout(new FlowLayout(5,5,5));
-		findP.setBorder(BorderFactory.createTitledBorder("Cerca risorsa e Scarica"));
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new FlowLayout(5,5,5));
+		searchPanel.setBorder(BorderFactory.createTitledBorder("Cerca risorsa e Scarica"));
 		searchArea = new JTextField(10);
 			 
-		searchButton = new JButton("Cerca e Scarica");
+		searchButton = new JButton("Cerca");
 		searchButton.setPreferredSize(new Dimension(searchButton.getPreferredSize().width,  
 											 searchArea.getPreferredSize().height)); 
-		findP.add(searchArea); 	//aggiungo la casella di testo
-		findP.add(searchButton);	//aggiungo il pulsante cerca
+		searchPanel.add(searchArea); 	//aggiungo la casella di testo
+		searchPanel.add(searchButton);	//aggiungo il pulsante cerca
 		searchButton.setEnabled(false);
 				
 		//creo il pulsante Disconnetti
-		disconnectButton = new JButton("    avvio client...    ");
+		disconnectButton = new JButton("Disconnetti");
 		disconnectButton.setPreferredSize(new Dimension(disconnectButton.getPreferredSize().width,  
-													findP.getPreferredSize().height-9)); 
+													searchPanel.getPreferredSize().height-9)); 
 		disconnectButton.setEnabled(false);
 		
 		//aggiungo barra di ricerca e pulsante disconnetti al pannello sensiblePanel
-		sensiblePanel.add(findP);
+		sensiblePanel.add(searchPanel);
 		sensiblePanel.add(disconnectButton);
 		
-		//creo pannello resourcesAreatatus -> resourcesArea completi e coda download
-		JPanel resourcesAreatatusP = new JPanel();
-		resourcesAreatatusP.setLayout(new GridLayout(1,2,5,5));
+		//creo pannello risorse complete e coda download
+		JPanel resourcePanel = new JPanel();
+		resourcePanel.setLayout(new GridLayout(1,2,5,5));
 		
 		//ora le varie aree di testo
 		resourcesArea = new JTextArea();
-		JScrollPane resourcesAreaList = new JScrollPane(resourcesArea);
-		resourcesAreaList.setBorder(BorderFactory.createTitledBorder("File completi - logs download"));
-		resourcesAreatatusP.add(resourcesAreaList);	
+		JScrollPane resourcesPanel = new JScrollPane(resourcesArea);
+		resourcesPanel.setBorder(BorderFactory.createTitledBorder("File completi"));
+		resourcePanel.add(resourcesPanel);	
 		resourcesArea.setEditable(false);		//le aree di testo non sono modificabili
 		
 		downloadQueue = new JTextArea();
-		JScrollPane downloadQueueList = new JScrollPane(downloadQueue);
-		downloadQueueList.setBorder(BorderFactory.createTitledBorder("Coda download"));
-		resourcesAreatatusP.add(downloadQueueList);
+		JScrollPane downloadQueuePanel = new JScrollPane(downloadQueue);
+		downloadQueuePanel.setBorder(BorderFactory.createTitledBorder("Coda download"));
+		resourcePanel.add(downloadQueuePanel);
 		downloadQueue.setEditable(false);		//le aree di testo non sono modificabili
 		
-		//preparo il logs sottostante
 		logs = new JTextArea();
 		logs.setFont(new Font("Arial", Font.PLAIN, 10));
-		JScrollPane logList = new JScrollPane(logs);
-		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //scrolling continuo verso il basso
+		JScrollPane logPanel = new JScrollPane(logs);
+		DefaultCaret caret = (DefaultCaret) logs.getCaret(); //la visualizzazione di nuovi log causa scrolling automatico
 		caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
-		logList.setBorder(BorderFactory.createTitledBorder("logs"));
-		//logs.setForeground(Color.RED);
-		logList.setPreferredSize(new Dimension(500, 200));
+		logPanel.setBorder(BorderFactory.createTitledBorder("logs"));
+		logPanel.setPreferredSize(new Dimension(500, 200));
 		logs.setEditable(false);				//le aree di testo non sono modificabili
 				
 		//aggiungo i vari pannelli al JFrame principale
 		frame.add(sensiblePanel,BorderLayout.NORTH);
-		frame.add(resourcesAreatatusP,BorderLayout.CENTER);
-		frame.add(logList,BorderLayout.SOUTH);				
+		frame.add(resourcePanel,BorderLayout.CENTER);
+		frame.add(logPanel,BorderLayout.SOUTH);				
 				
 		//gestisco le impostazioni della finestra
 		frame.setSize(500, 400);

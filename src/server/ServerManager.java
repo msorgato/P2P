@@ -11,10 +11,16 @@ public class ServerManager {
 			System.out.println("Sono occorsi problemi nella creazione del Server.\n"
 					+ "Verificare che il comando rmiregistry sia stato avviato correttamente.");
 			e.printStackTrace();
+			try {
+				Thread.sleep(2000);
+			} catch(InterruptedException ex) {}
 		} catch (AlreadyBoundedException e) {
 			System.out.println("Il Server di nome " + serverName + " risulta gia' presente. La pubblicazione di uno stesso\n"
 					+ "Server non e' consentita.");
 			e.printStackTrace();
+			try {
+				Thread.sleep(2000);
+			} catch(InterruptedException ex) {}
 		}
 	}
 	

@@ -27,12 +27,15 @@ public class Downloader {
 		}
 		
 		public void run() {
+			String targetName = "sconosciuto";
 			try {
-				gui.addLog("Scarico " + resourceName + " parte " + fragment + " da "  + target.getName());
+				targetName = target.getName();
+				gui.addLog("Scarico " + resourceName + " parte " + fragment + " da "  + targetName);
 				fragToDownload = target.sendResourceFragment(resourceName, resourceParts, fragment, clientDownloading);
 			} catch(RemoteException e) {
 				target = null;
 				fragToDownload = null;
+				gui.addLog("Problemi con download di parte " + fragment + " di " + resourceName + " da " + targetName);
 			}
 			synchronized(Downloader.this) {
 				if(!(target == null)) {
@@ -40,7 +43,6 @@ public class Downloader {
 				}
 				downloading--;
 				Downloader.this.notify();
-				System.out.println("Notifico il Downloader");
 			}
 			synchronized(fragments) {
 				if(fragToDownload != null) {
@@ -71,7 +73,6 @@ public class Downloader {
 						return null;	//se non c'è nessun thread che sta scaricando e ho finito i client, non posso scaricare la risorsa
 					try {
 						this.wait();
-						System.out.println("Downloader svegliato");
 					} catch(InterruptedException e) {
 						//Thread arrestato mentre aspettava di lanciare altri download
 						return null;

@@ -5,7 +5,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -15,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
 
 public class ClientGUI {
@@ -26,11 +33,21 @@ public class ClientGUI {
 	private JButton disconnectButton;		//pulsante di disconnessione
 	private JButton searchButton;			//pulsante di ricerca
 	
+	private Client client;
 	private ArrayList<String> resources = new ArrayList<String>();
+	private ArrayList<String> queue = new ArrayList<String>();
 	
-	public ClientGUI() {
+	public ClientGUI(Client client) {
+		this.client = client;
+		
 		//layout della GUI
-		frame = new JFrame("Client");
+		try {
+			frame = new JFrame("Client " + client.getName());
+		} catch (HeadlessException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		frame.setLayout(new BorderLayout());
 
 		//inizializzazione del pannello sensibile ad input
@@ -41,6 +58,33 @@ public class ClientGUI {
 		searchPanel.setLayout(new FlowLayout(5,5,5));
 		searchPanel.setBorder(BorderFactory.createTitledBorder("Cerca risorsa e Scarica"));
 		searchArea = new JTextField(10);
+		searchArea.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				if(verifyResource(searchArea.getText()))
+					searchButton.setEnabled(true);
+				else
+					searchButton.setEnabled(false);
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				if(verifyResource(searchArea.getText()))
+					searchButton.setEnabled(true);
+				else
+					searchButton.setEnabled(false);
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				if(verifyResource(searchArea.getText()))
+					searchButton.setEnabled(true);
+				else
+					searchButton.setEnabled(false);
+			}
+			
+		});
 			 
 		searchButton = new JButton("Cerca");
 		searchButton.setPreferredSize(new Dimension(searchButton.getPreferredSize().width,  
@@ -48,12 +92,40 @@ public class ClientGUI {
 		searchPanel.add(searchArea); 	//aggiungo la casella di testo
 		searchPanel.add(searchButton);	//aggiungo il pulsante cerca
 		searchButton.setEnabled(false);
+		searchButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String content = searchArea.getText();
+				String[] splitted = content.split(" ");
+				try {
+					client.download(splitted[0], Integer.parseInt(splitted[1]));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
 				
 		//creo il pulsante Disconnetti
 		disconnectButton = new JButton("Disconnetti");
 		disconnectButton.setPreferredSize(new Dimension(disconnectButton.getPreferredSize().width,  
 													searchPanel.getPreferredSize().height - 9)); 
 		disconnectButton.setEnabled(false);
+		disconnectButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					client.disconnectFromServer();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		});
 		
 		//aggiungo barra di ricerca e pulsante disconnetti al pannello sensiblePanel
 		sensiblePanel.add(searchPanel);
@@ -99,7 +171,7 @@ public class ClientGUI {
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 	
-	public void addLog(String log) {
+	public synchronized void addLog(String log) {
 		logs.append("\n" + log);
 	}
 	
@@ -128,11 +200,34 @@ public class ClientGUI {
 		synchronized(resources) {
 			if(resources.size() != 0)
 				resourcesArea.append(resources.get(0));
-			for(int i = 0; i < resources.size(); i++) {
-				resourcesArea.append(resources.get(i));
+			for(int i = 1; i < resources.size(); i++) {
+				resourcesArea.append("\n" + resources.get(i));
 			}
 		}
 	}
 	
+	public void enableLogout() {
+		disconnectButton.setEnabled(true);
+	}
 	
+	public void disableLogout() {
+		disconnectButton.setEnabled(false);
+	}
+	
+	private static boolean verifyResource(String content) {
+		String[] splitted;
+		try {
+			splitted = content.split(" ");
+		} catch(PatternSyntaxException e) {
+			return false;
+		}
+		if(splitted.length != 2)
+			return false;
+		try {
+			int i = Integer.parseInt(splitted[1]);
+		} catch(NumberFormatException ex) {
+			return false;
+		}
+		return true;
+	}
 }

@@ -36,6 +36,9 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		name = cName;
 		maxDownloads = maxD;
 		resources = res;
+		gui = new ClientGUI(this);
+		for(int i = 0; i < resources.size(); i++)
+			gui.addResource(resources.get(i).getName() + " " + resources.get(i).getParts());
 		try {
 			server = (Server) Naming.lookup("rmi://" + HOST + "/" + sName);
 		} catch(RemoteException ex) {
@@ -59,15 +62,15 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		}
 		try {
 			connected = server.connect(this);
-			System.out.println("Connesso al server " + server.getName());
+			gui.addLog("Connesso al server " + server.getName());
 		} catch(RemoteException ecc) {
-			System.out.println("La connessione al server " + sName + " è caduta");
+			gui.addLog("La connessione al server " + sName + " e' caduta");
 		}
 		catch(Exception exc) {
 			connected = false;
 			return;
 		}
-		gui = new ClientGUI();
+		gui.enableLogout();
 	}
 	
 	@Override
@@ -92,14 +95,12 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 		} catch(InterruptedException e) {
 			return null;
 		}
-		System.out.println("Client " + name + " dice che client " + c.getName() + " sta scaricando la risorsa "+ nm + " di " + prts + "parti"); //---------------------------------
 		int resourceIndex = -1;		
 		synchronized(resources) {	
 			for(int i = 0; i < resources.size() && resourceIndex == -1; i++) {
 				if(resources.get(i).equalsResource(nm, prts))	
 					resourceIndex = i;
 			}
-			System.out.println("resourceIndex: " + resourceIndex);
 			if(resourceIndex == -1)
 				return null;
 			try {
@@ -107,7 +108,6 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			} catch(RemoteException e) {	//il client target e' morto mentre aspettava il frammento
 				return null;
 			}
-			System.out.println(name + " ha terminato di inviare la parte " + frgm + "della risorsa");
 			return resources.get(resourceIndex).getFragment(frgm);	
 		}	
 	}	
@@ -115,11 +115,15 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 	@Override
 	public boolean download(String nm, int prts) throws RemoteException{
 		if(connected) {
-			ArrayList<Client> clients;
+			ArrayList<Client> clients = new ArrayList<Client>();
 			try {
 				clients = server.searchResource(nm, prts);
 			} catch(RemoteException e) {
 				connected = false;
+				return false;
+			}
+			if(clients.isEmpty()) {
+				gui.addLog("Risorsa " + nm + " " + prts + " non trovata");
 				return false;
 			}
 			Downloader downloader = new Downloader(nm, prts, clients, this, maxDownloads, gui);
@@ -136,7 +140,8 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			} catch(RemoteException e) {
 				connected = false;
 			}
-			System.out.println("Scaricata la risorsa " + resToAdd.getName() + " " + resToAdd.getParts());
+			gui.addResource(resToAdd.getName() + " " + resToAdd.getParts());
+			gui.addLog("Scaricata la risorsa " + resToAdd.getName() + " " + resToAdd.getParts());
 			return true;
 		}
 		return false;
@@ -162,9 +167,11 @@ public class ConcreteClient extends UnicastRemoteObject implements Client {
 			try {
 				server.disconnect(this);
 			} catch(RemoteException e) {
-				System.out.println("Alla disconnessione del Client " + name + ", anche il Server ha presentato problemi");
+				gui.addLog("Alla disconnessione del Client " + name + ", anche il Server ha presentato problemi");
 			}
 			connected = false;
+			gui.disableLogout();
+			gui.addLog("Disconnesso dal Server");
 		}
 	}
 	

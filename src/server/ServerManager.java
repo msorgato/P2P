@@ -10,16 +10,11 @@ public class ServerManager {
 		} catch (RemoteException e) {
 			System.out.println("Sono occorsi problemi nella creazione del Server. Verificare che il comando rmiregistry sia stato avviato correttamente.");
 			e.printStackTrace();
-			try {
-				Thread.sleep(2000);
-			} catch(InterruptedException ex) {}
 		} catch (AlreadyBoundedException e) {
 			System.out.println("Il Server di nome " + serverName + " risulta gia' presente. La pubblicazione di uno stesso\n"
 					+ "Server non e' consentita.");
 			e.printStackTrace();
-			try {
-				Thread.sleep(2000);
-			} catch(InterruptedException ex) {}
+			System.exit(0);
 		}
 	}
 	

@@ -88,7 +88,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 			ex.printStackTrace();
 		}
 		System.out.println("Server " + name + " pubblicizzato");
-		gui = new ServerGUI();
+		gui = new ServerGUI(name);
 		if(!(serverNames == null)) {
 			for(int i = 0; i < serverNames.length; i++) {
 				Server srvr = null;
@@ -134,13 +134,13 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	
 	@Override
 	public ArrayList<Client> searchResource(String name, int parts) throws RemoteException {
-		ArrayList<Client> cli = this.searchClient(name, parts);
+		ArrayList<Client> cli = searchClient(name, parts);
 		synchronized(servers) {
 			for(int i = 0; i < servers.size(); i++) {
 				ArrayList<Client> otherCli = new ArrayList<Client>();
 				try {
 					otherCli.addAll(servers.get(i).searchClient(name, parts));
-				} catch(RemoteException e) {	//Un server nella lista si è disconnesso o ha avuto problemi
+				} catch(RemoteException e) {	//Un server nella lista si e' disconnesso o ha avuto problemi
 					servers.remove(i);
 					continue;	//salta la concatenazione dei client provenienti dall'ultimo Server ed esegue l'iterata successiva
 				}
@@ -233,7 +233,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 		} catch(RemoteException e) {}
 		synchronized(registry) {
 			for(int i = 0; i < registry.size(); i++) {
-				if(registry.get(i).client == c) {
+				if(registry.get(i).client.equals(c)) {
 					registry.remove(i);
 					gui.removeClient(cName);
 					return true;

@@ -23,9 +23,9 @@ public class ServerGUI {
 	private ArrayList<String> clientsConnected = new ArrayList<String>();
 	private ArrayList<String> serversConnected = new ArrayList<String>();
 	
-	public ServerGUI() {
+	public ServerGUI(String name) {
 		//layout della GUI
-		frame = new JFrame("Server");
+		frame = new JFrame("Server " + name);
 		frame.setLayout(new BorderLayout());
 		
 		//inizializzazione del pannello principale
@@ -135,7 +135,7 @@ public class ServerGUI {
 			if(serversConnected.size() != 0)
 				servers.append(serversConnected.get(0));
 			for(int i = 1; i < serversConnected.size(); i++) {
-				clients.append("\n" + serversConnected.get(i));
+				servers.append("\n" + serversConnected.get(i));
 			}
 		}
 	}	

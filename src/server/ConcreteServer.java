@@ -16,7 +16,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 	private ArrayList<Server> servers = new ArrayList<Server>();
 	private static final String HOST = "localhost";
 	
-	private ServerGUI gui = new ServerGUI();
+	private ServerGUI gui;
 	
 	private class ClientRegistry {
 		private Client client;
@@ -115,6 +115,7 @@ public class ConcreteServer extends UnicastRemoteObject implements Server {
 				}
 			}
 		}
+		gui = new ServerGUI();
 	}
 	
 	@Override
